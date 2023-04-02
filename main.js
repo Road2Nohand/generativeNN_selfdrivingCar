@@ -69,6 +69,8 @@ class Car {
         this.height = height;
         this.speed = 0;
         this.acceleration = 0.1;
+        this.maxSpeed = 3;
+        this.friction = 0.02;
         this.controller = new Controller();
     }
 
@@ -79,7 +81,25 @@ class Car {
         if(this.controller.reverse){
             this.speed -= this.acceleration;
         }
-        this.y -= this.speed;
+
+        //vorwärts & rückwärts Speed Begrenzung
+        if(this.speed > this.maxSpeed){
+            this.speed = this.maxSpeed;
+        }
+        if(this.speed < -this.maxSpeed / 2){
+            this.speed = -this.maxSpeed / 2;
+        }
+        // Reibung damit wir nicht infinite beschleunigen
+        if(this.speed > 0){
+            this.speed -= this.friction;
+        }
+        if(this.speed < 0){
+            this.speed += this.friction;
+        }
+        if(Math.abs(this.speed) < this.friction){ //für den Fall dass speed um friction herumhovert und nicht endet
+            this.speed=0;
+        }
+        this.y -= this.speed; // Speed aktualisieren
     }
 
     draw(){
@@ -91,11 +111,9 @@ class Car {
         // Speed in die Mitte des Autos
         CTX.font = '24px Calibri';
         CTX.fillStyle = 'white';
-        // Messe die Breite des Textes, um ihn zentriert zu zeichnen
         const speedText = this.speed.toFixed(2);
-        const textWidth = CTX.measureText(speedText).width;
-        // Zeichne den Text "Auto" in der Mitte des Autos
-        CTX.fillText(speedText, this.x - textWidth / 2, this.y + this.height / 7);
+        const textWidth = CTX.measureText(speedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen        
+        CTX.fillText(speedText, this.x - textWidth / 2, this.y + this.height / 7); // Zeichne den Text "Auto" in der Mitte des Autos
     }
 }//endOf Car
 
