@@ -71,7 +71,7 @@ class Car {
         this.angle = 0;
         this.acceleration = 0.1;
         this.maxYspeed = 3;
-        this.friction = 0.02;
+        this.friction = 0.05;
         this.controller = new Controller();
     }
 
@@ -101,19 +101,18 @@ class Car {
         if(Math.abs(this.ySpeed) < this.friction){ //für den Fall dass ySpeed um friction herumhovert und nicht endet
             this.ySpeed=0;
         }
-        this.y -= this.ySpeed; // ySpeed aktualisieren
 
-
-        // Anstatt Links und Rechts, Winkel
+        // Anstatt Links und Rechts arbeiten wir mit Winkeln durch translate() und rotate()
         if(this.controller.right){
-            this.angle += 0.03;
+            this.angle -= 0.02;
         }
         if(this.controller.left){
-            this.angle -= 0.03;
+            this.angle += 0.02;
         }
 
-
-
+        // Position aktualisieren
+        this.x-=Math.sin(this.angle)*this.ySpeed
+        this.y-=Math.cos(this.angle)*this.ySpeed
     }
 
     draw(){
@@ -133,7 +132,7 @@ class Car {
         const textWidth = CTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen        
         CTX.fillText(ySpeedText, -textWidth / 2, 0); // Zeichne den Text "Auto" in der Mitte des Autos
 
-        CTX.restore(); //für das translate() ???
+        CTX.restore(); //für das translate(), alles bis hier hin wird gedreht
     }
 }//endOf Car
 
