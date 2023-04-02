@@ -162,12 +162,20 @@ class Road{
         for(let i=0; i<=this.laneCount; i++){
             // Position der zwischen Linien varriert je nach Anzahl deswegen Lineare Interpolierung
             const x = lerp(this.xLeft, this.xRight, i/this.laneCount); 
+
+            //mittlere Linien grau
+            if(i > 0 && i < this.laneCount){
+                CTX.strokeStyle = "gray";
+            }
+            else{
+                CTX.strokeStyle = "white";
+            }
+
             CTX.beginPath();
             CTX.moveTo(x, this.top);
             CTX.lineTo(x, this.bottom);
             CTX.stroke();
         }
-
     }
 }//endOf Road
 
@@ -189,7 +197,7 @@ function lerp(A,B,t){
 
 //#region Main
 
-const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, 2);// 0.95 für Abstand am Straßenrand
+const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, 3);// 0.95 für Abstand am Straßenrand
 const auto = new Car(CANVAS.width/2, CANVAS.height/2, 50, 75);
 
 // Gameloop
