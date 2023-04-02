@@ -2,7 +2,7 @@
 
 const CANVAS = document.getElementById("carCanvas");
 CANVAS.height = window.innerHeight;
-CANVAS.width = 200;
+CANVAS.width = 400;
 const CTX = CANVAS.getContext("2d");
 
 //#endregionGlobals
