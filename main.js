@@ -170,10 +170,10 @@ class Road{
 
             //mittlere Linien grau
             if(i > 0 && i < this.laneCount){
-                CTX.strokeStyle = "gray";
+                CTX.strokeStyle = "white";
             }
             else{
-                CTX.strokeStyle = "white";
+                CTX.strokeStyle = "gray";
             }
 
             CTX.beginPath();
@@ -203,7 +203,7 @@ function lerp(A,B,t){
 //#region Main
 
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, 3);// 0.95 für Abstand am Straßenrand
-const auto = new Car(straße.getLaneCenter(2), CANVAS.height/2, 50, 75);
+const auto = new Car(straße.getLaneCenter(0), CANVAS.height/2, 50, 75);
 
 // Gameloop
 animate();
