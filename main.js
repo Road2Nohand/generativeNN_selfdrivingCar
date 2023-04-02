@@ -67,53 +67,73 @@ class Car {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.speed = 0;
+        this.ySpeed = 0;
+        this.angle = 0;
         this.acceleration = 0.1;
-        this.maxSpeed = 3;
+        this.maxYspeed = 3;
         this.friction = 0.02;
         this.controller = new Controller();
     }
 
     update(){
         if(this.controller.forward){
-            this.speed += this.acceleration;
+            this.ySpeed += this.acceleration;
         }
         if(this.controller.reverse){
-            this.speed -= this.acceleration;
+            this.ySpeed -= this.acceleration;
         }
 
-        //vorwärts & rückwärts Speed Begrenzung
-        if(this.speed > this.maxSpeed){
-            this.speed = this.maxSpeed;
+        // Movement: OBEN und UNTEN
+        //vorwärts & rückwärts ySpeed Begrenzung
+        if(this.ySpeed > this.maxYspeed){
+            this.ySpeed = this.maxYspeed;
         }
-        if(this.speed < -this.maxSpeed / 2){
-            this.speed = -this.maxSpeed / 2;
+        if(this.ySpeed < -this.maxYspeed / 2){
+            this.ySpeed = -this.maxYspeed / 2;
         }
         // Reibung damit wir nicht infinite beschleunigen
-        if(this.speed > 0){
-            this.speed -= this.friction;
+        if(this.ySpeed > 0){
+            this.ySpeed -= this.friction;
         }
-        if(this.speed < 0){
-            this.speed += this.friction;
+        if(this.ySpeed < 0){
+            this.ySpeed += this.friction;
         }
-        if(Math.abs(this.speed) < this.friction){ //für den Fall dass speed um friction herumhovert und nicht endet
-            this.speed=0;
+        if(Math.abs(this.ySpeed) < this.friction){ //für den Fall dass ySpeed um friction herumhovert und nicht endet
+            this.ySpeed=0;
         }
-        this.y -= this.speed; // Speed aktualisieren
+        this.y -= this.ySpeed; // ySpeed aktualisieren
+
+
+        // Anstatt Links und Rechts, Winkel
+        if(this.controller.right){
+            this.angle += 0.03;
+        }
+        if(this.controller.left){
+            this.angle -= 0.03;
+        }
+
+
+
     }
 
     draw(){
+        CTX.save()
+        CTX.translate(this.x, this.y) //gibt an zu welchen Punkt wir gehen wollen
+        CTX.rotate(-this.angle)
+
         CTX.beginPath();
-        CTX.rect(this.x - this.width/2, this.y-this.height/2, this.width, this.height);
+        CTX.rect(-this.width/2, -this.height/2, this.width, this.height);
         CTX.fillStyle = 'black';
         CTX.fill();
 
-        // Speed in die Mitte des Autos
+        // ySpeed in die Mitte des Autos
         CTX.font = '24px Calibri';
         CTX.fillStyle = 'white';
-        const speedText = this.speed.toFixed(2);
-        const textWidth = CTX.measureText(speedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen        
-        CTX.fillText(speedText, this.x - textWidth / 2, this.y + this.height / 7); // Zeichne den Text "Auto" in der Mitte des Autos
+        const ySpeedText = this.ySpeed.toFixed(2);
+        const textWidth = CTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen        
+        CTX.fillText(ySpeedText, -textWidth / 2, 0); // Zeichne den Text "Auto" in der Mitte des Autos
+
+        CTX.restore(); //für das translate() ???
     }
 }//endOf Car
 
