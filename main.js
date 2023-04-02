@@ -71,11 +71,15 @@ class Car {
         this.angle = 0;
         this.acceleration = 0.1;
         this.maxYspeed = 3;
-        this.friction = 0.05;
+        this.friction = 0.03;
         this.controller = new Controller();
     }
 
     update(){
+        this.#move();
+    }
+
+    #move(){
         if(this.controller.forward){
             this.ySpeed += this.acceleration;
         }
@@ -136,18 +140,57 @@ class Car {
     }
 }//endOf Car
 
+
+class Road{
+    constructor(x, width, laneCount=3){
+        this.x = x;
+        this.width = width;
+        this.laneCount = laneCount;
+        this.xLeft = x - width/2; //position ganz linkes x
+        this.xRight = x + width/2;
+        //road soll infinite lang sien
+        const infinity = 100000000; //workaround weil sonst weird bugs mit Math.Infinity
+        this.top = -infinity;
+        this.bottom = infinity;
+    }
+
+    draw(){
+        CTX.lineWidth = 5;
+        CTX.strokeStyle = "white";
+
+        // i Lanes in gleichem Abstand zeichnen
+        for(let i=0; i<=this.laneCount; i++){
+            // Position der zwischen Linien varriert je nach Anzahl deswegen Lineare Interpolierung
+            const x = lerp(this.xLeft, this.xRight, i/this.laneCount); 
+            CTX.beginPath();
+            CTX.moveTo(x, this.top);
+            CTX.lineTo(x, this.bottom);
+            CTX.stroke();
+        }
+
+    }
+}//endOf Road
+
+
 //#endregion Klassen
 
 
 
 //#region Funktionen
+
+// Lineare Interpolierungs Hilfs-Funktion
+function lerp(A,B,t){
+    return A+(B-A)*t;
+}
+
 //#endregion Funktionen
 
 
 
 //#region Main
 
-auto = new Car(CANVAS.width/2, CANVAS.height/2, 50, 75);
+const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, 2);// 0.95 für Abstand am Straßenrand
+const auto = new Car(CANVAS.width/2, CANVAS.height/2, 50, 75);
 
 // Gameloop
 animate();
@@ -156,6 +199,7 @@ function animate(){
 
     CTX.clearRect(0,0, CANVAS.width, CANVAS.height);
     
+    straße.draw();
     auto.draw();
     requestAnimationFrame(animate);
 }
@@ -169,7 +213,6 @@ function animate(){
 // wenn man die Fenster-Größe verändert
 window.addEventListener("resize", () => {
     CANVAS.height = window.innerHeight;
-    CANVAS.width = 200;
 });
 
 //#endregion EventListener
