@@ -1,0 +1,14 @@
+* {
+    font-family: Calibri;
+    margin: 0;
+    text-align: center; /*Wennn Text vorhanden in einem Block, dann mittig*/
+}
+
+body {
+    background: darkgray;
+    overflow: hidden; /*Für Scrollbars*/
+}
+
+#carCanvas {
+    background: lightslategray;
+}
