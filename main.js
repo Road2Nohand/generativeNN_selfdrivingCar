@@ -3,6 +3,7 @@
 const CANVAS = document.getElementById("carCanvas");
 CANVAS.height = window.innerHeight;
 CANVAS.width = 200;
+const CTX = CANVAS.getContext("2d");
 
 //#endregionGlobals
 
@@ -69,10 +70,19 @@ class Car {
         this.controller = new Controller();
     }
 
-    draw(ctx){
-        ctx.beginPath();
-        ctx.rect(this.x - this.width/2, this.y-this.height/2, this.width, this.height);
-        ctx.fill();
+    update(){
+        if(this.controller.forward){
+            this.y -= 2;
+        }
+        if(this.controller.reverse){
+            this.y += 2;
+        }
+    }
+
+    draw(){
+        CTX.beginPath();
+        CTX.rect(this.x - this.width/2, this.y-this.height/2, this.width, this.height);
+        CTX.fill();
     }
 }//endOf Car
 
@@ -87,12 +97,17 @@ class Car {
 
 //#region Main
 
-gameLoop();
+auto = new Car(CANVAS.width/2, CANVAS.height/2, 50, 75);
 
-function gameLoop(){
-    const ctx = CANVAS.getContext("2d");
-    auto = new Car(CANVAS.width/2, CANVAS.height/2, 50, 75);
-    auto.draw(ctx);
+// Gameloop
+animate();
+function animate(){
+    auto.update();
+
+    CTX.clearRect(0,0, CANVAS.width, CANVAS.height);
+    
+    auto.draw();
+    requestAnimationFrame(animate);
 }
 
 //#endregion Main
@@ -105,7 +120,6 @@ function gameLoop(){
 window.addEventListener("resize", () => {
     CANVAS.height = window.innerHeight;
     CANVAS.width = 200;
-    gameLoop();
 });
 
 //#endregion EventListener
