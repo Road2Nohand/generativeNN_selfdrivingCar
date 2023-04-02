@@ -11,4 +11,5 @@ body {
 
 #carCanvas {
     background: lightslategray;
+    border: 1px solid black;
 }

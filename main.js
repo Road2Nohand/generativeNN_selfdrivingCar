@@ -56,7 +56,7 @@ class Controller {
                     break;
             }
         }
-    }
+    }//endOf #addKeyboardListener()
 
 }//endOf Controller
 
@@ -67,22 +67,35 @@ class Car {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.speed = 0;
+        this.acceleration = 0.1;
         this.controller = new Controller();
     }
 
     update(){
         if(this.controller.forward){
-            this.y -= 2;
+            this.speed += this.acceleration;
         }
         if(this.controller.reverse){
-            this.y += 2;
+            this.speed -= this.acceleration;
         }
+        this.y -= this.speed;
     }
 
     draw(){
         CTX.beginPath();
         CTX.rect(this.x - this.width/2, this.y-this.height/2, this.width, this.height);
+        CTX.fillStyle = 'black';
         CTX.fill();
+
+        // Speed in die Mitte des Autos
+        CTX.font = '24px Calibri';
+        CTX.fillStyle = 'white';
+        // Messe die Breite des Textes, um ihn zentriert zu zeichnen
+        const speedText = this.speed.toFixed(2);
+        const textWidth = CTX.measureText(speedText).width;
+        // Zeichne den Text "Auto" in der Mitte des Autos
+        CTX.fillText(speedText, this.x - textWidth / 2, this.y + this.height / 7);
     }
 }//endOf Car
 
