@@ -154,6 +154,11 @@ class Road{
         this.bottom = infinity;
     }
 
+    getLaneCenter(laneIndex){
+        const laneWidth = this.width / this.laneCount; //Breite einer Spur
+        return this.xLeft + laneWidth / 2 + laneIndex*laneWidth;
+    }
+
     draw(){
         CTX.lineWidth = 5;
         CTX.strokeStyle = "white";
@@ -198,7 +203,7 @@ function lerp(A,B,t){
 //#region Main
 
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, 3);// 0.95 für Abstand am Straßenrand
-const auto = new Car(CANVAS.width/2, CANVAS.height/2, 50, 75);
+const auto = new Car(straße.getLaneCenter(2), CANVAS.height/2, 50, 75);
 
 // Gameloop
 animate();
