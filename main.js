@@ -149,7 +149,7 @@ class Road{
         this.xLeft = x - width/2; //position ganz linkes x
         this.xRight = x + width/2;
         //road soll infinite lang sien
-        const infinity = 100000000; //workaround weil sonst weird bugs mit Math.Infinity
+        const infinity = 50000000; //workaround weil sonst weird bugs mit Math.Infinity und Dashes verschwinden z.B.
         this.top = -infinity;
         this.bottom = infinity;
     }
@@ -171,11 +171,12 @@ class Road{
             //mittlere Linien grau
             if(i > 0 && i < this.laneCount){
                 CTX.strokeStyle = "white";
+                CTX.setLineDash([20, 20]);
             }
             else{
                 CTX.strokeStyle = "gray";
+                CTX.setLineDash([]);
             }
-
             CTX.beginPath();
             CTX.moveTo(x, this.top);
             CTX.lineTo(x, this.bottom);
@@ -210,7 +211,7 @@ animate();
 function animate(){
     auto.update();
 
-    CTX.clearRect(0,0, CANVAS.width, CANVAS.height);
+    CANVAS.height = window.innerHeight; // anstatt "clearRect"
     
     straße.draw();
     auto.draw();
