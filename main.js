@@ -123,6 +123,10 @@ class Car {
 
     draw(){
         CTX.save()
+
+        // Sensor mit Rays zeichnen
+        this.sensor.draw();
+
         CTX.translate(this.x, this.y) //gibt an zu welchen Punkt wir gehen wollen
         CTX.rotate(-this.angle)
 
@@ -139,9 +143,6 @@ class Car {
         CTX.fillText(ySpeedText, -textWidth / 2, 0); // Zeichne den Text "Auto" in der Mitte des Autos
 
         CTX.restore(); //für das translate(), alles bis hier hin wird gedreht
-
-        // Sensor mit Rays zeichnen
-        this.sensor.draw();
     }
 }//endOf Car
 
@@ -211,7 +212,7 @@ class Sensor{
     constructor(auto){
         this.auto = auto;
         this.rayCount = 3; //anz der "Fühler" pro Sensor
-        this.rayLength = 100; //der Sensor kann nur in einem Radius von 100px "Sehen"
+        this.rayLength = 200; //der Sensor kann nur in einem Radius von 100px "Sehen"
         this.raySpread = Math.PI / 4; //45° alle Rays befinden sich in diesem Bereich
         this.rays = [];
     }
