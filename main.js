@@ -148,14 +148,26 @@ class Road{
         this.laneCount = laneCount;
         this.xLeft = x - width/2; //position ganz linkes x
         this.xRight = x + width/2;
-        //road soll infinite lang sien
-        const infinity = 50000000; //workaround weil sonst weird bugs mit Math.Infinity und Dashes verschwinden z.B.
+        //road soll eig. infinite lang sein (nach oben y=0, also in y=-Bereich raus und unten y=window.height + Bereich)
+        const infinity = 50000000; //workaround weil sonst weird bugs mit Math.Infinity und Dashes verschwinden z.B. so sinds 50.000.000 Pixel
         this.top = -infinity;
         this.bottom = infinity;
+
+        // für zukünftig Runde Kurven
+        // & für die Road-Border Detection
+        this.topLeft = { x : this.xLeft, y : this.top }; // Position des Punktes am obersten Linken Straßenrand in (x,y) Format
+        this.bottomLeft = { x : this.xLeft, y : this.bottom }; // Position des Punktes am untersten Linken Straßenrand in (x,y) Format
+        this.topRight = { x : this.xRight, y : this.top }; // " "
+        this.bottomRight = { x : this.xRight, y : this.bottom };
+        // beinhaltet dann hinterher die positionen der Grenzen in (x,y) Format, dynamisch je nachdem wie breit die Lanes sind und die Straße, fancy!
+        this.borders = [
+            [this.topLeft, this.bottomLeft], // x,y linke Border
+            [this.topRight, this.bottomRight] // x,y rechte Border
+        ];
     }
 
     getLaneCenter(laneIndex){
-        const laneWidth = this.width / this.laneCount; //Breite einer Spur
+        const laneWidth = this.width / this.laneCount; //Breite einer Lane
         return this.xLeft + laneWidth / 2 + laneIndex*laneWidth;
     }
 
@@ -164,24 +176,29 @@ class Road{
         CTX.strokeStyle = "white";
 
         // i Lanes in gleichem Abstand zeichnen
-        for(let i=0; i<=this.laneCount; i++){
+        for(let i=1; i<=this.laneCount-1; i++){
             // Position der zwischen Linien varriert je nach Anzahl deswegen Lineare Interpolierung
             const x = lerp(this.xLeft, this.xRight, i/this.laneCount); 
 
-            //mittlere Linien grau
-            if(i > 0 && i < this.laneCount){
-                CTX.strokeStyle = "white";
-                CTX.setLineDash([20, 20]);
-            }
-            else{
-                CTX.strokeStyle = "gray";
-                CTX.setLineDash([]);
-            }
+            // mittlere Linien weiß und gestrichelt
+            CTX.strokeStyle = "white";
+            CTX.setLineDash([30, 30]);
+
             CTX.beginPath();
             CTX.moveTo(x, this.top);
             CTX.lineTo(x, this.bottom);
             CTX.stroke();
         }
+
+        // Straßenrand in grau und durchgezogen
+        this.borders.forEach(border => { // geht die Border-Arrays durch
+            CTX.strokeStyle = "gray";
+            CTX.setLineDash([]);
+            CTX.beginPath();
+            CTX.moveTo(border[0].x, border[0].y); // erster Punkt der Border
+            CTX.lineTo(border[1].x, border[1].y); // zweiter Punkt 
+            CTX.stroke();
+        });
     }
 }//endOf Road
 
@@ -203,8 +220,8 @@ function lerp(A,B,t){
 
 //#region Main
 
-const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, 3);// 0.95 für Abstand am Straßenrand
-const auto = new Car(straße.getLaneCenter(0), CANVAS.height/2, 50, 75);
+const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
+const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75);
 
 // Gameloop
 animate();
