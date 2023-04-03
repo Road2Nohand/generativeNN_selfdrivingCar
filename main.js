@@ -76,9 +76,9 @@ class Car {
         this.sensor = new Sensor(this);
     }
 
-    update(){
+    update(roadBorders){
         this.#move();
-        this.sensor.update();
+        this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
     }
 
     #move(){
@@ -216,10 +216,47 @@ class Sensor{
         this.rayLength = 300; //der Sensor kann nur in einem Radius von 100px "Sehen"
         this.raySpread = Math.PI / 2; //90° alle Rays befinden sich in diesem Bereich
         this.rays = [];
+        this.readings = []; //beinhaltet die Messungen der Rays (Entfernung zu einer Border)
     }
 
-    update(){
+    update(roadBorders){
         this.#castRays();
+        
+        this.readings = []; // Messungen der Sensoren werden jedes Frame geleert/aktualisiert
+
+        this.rays.forEach(ray => { // pushen eines Readings je Ray
+            this.readings.push(this.#getReading(ray, roadBorders)); 
+        });
+
+
+    }
+
+    #getReading(ray, roadBorders){  // messen wo der ray eine Border trifft
+        let touches = []; // Schnittpunkte des Rays
+        
+        // prüfe für jede Border ob es Schnittpunkte gibt mit dem aktuellen ray
+        for(let i=0; i < roadBorders.length; i++) {
+            // man kann mit einem Strahl durch mehrere Objekte gehen und so mehrere Schnittpunkte haben, davon immer den nahesten nehmen, deswegen...
+            const touch = getIntersection( //utility Function
+                ray[0], // start
+                ray[1], // ende
+                roadBorders[i][0],
+                roadBorders[i][1]
+            ); 
+
+            if(touch){
+                touches.push(touch); // wenn es keine touches gibt, bleibt das Array einfach leer
+            }
+        }
+        // wenn keine touches
+        if(touches.length == 0){
+            return null;
+        }
+        else { // wenn wir einen Touch haben bekommen wir 3 Werte x, y der Position und den Abstand (offset) zur Position von getIntersaction()
+            const offsets = touches.map(touch => touch.offset); // zieht aus allen touches nur den "offset" raus und baut daraus ein neues array "offsets"
+            const minOffset = Math.min(...offsets); //min() nimmt normalerweise keine arrays an, aber "..." spreaded die Werte aus dem array raus
+            return touches.find(touch => touch.offset == minOffset); // gib mir den Touch zurück der den minimal offset hat
+        }
     }
 
     #castRays(){
@@ -247,6 +284,14 @@ class Sensor{
 
     draw(){
         for(let i=0; i < this.rayCount; i++){
+            // Bevor wir die Rays zeichnen, checken wir ob ein Ray schneidet und verkürzen ihn entsprechend des Schnittpunktes mit einer Boarder
+            let end = this.rays[i][1]; //alte End-Koordinate
+            
+            if(this.readings[i]){ // wenn es eine Collision, also Messung gibt
+                end = this.readings[i];
+            }
+
+            // zeichnen bis zur Collision
             CTX.beginPath();
             CTX.lineWidth = 2;
             CTX.strokeStyle = "yellow";
@@ -255,8 +300,22 @@ class Sensor{
                 this.rays[i][0].y
             );
             CTX.lineTo( // [i][1] ist y von einem Ray
-                this.rays[i][1].x,
+                end.x,
+                end.y
+            );
+            CTX.stroke();
+
+            // zeichnen des Stücks nach einer Collision
+            CTX.beginPath();
+            CTX.lineWidth = 2;
+            CTX.strokeStyle = "red";
+            CTX.moveTo( // [i][0] x von einem Ray
+                this.rays[i][1].x, 
                 this.rays[i][1].y
+            );
+            CTX.lineTo( // [i][1] ist y von einem Ray
+                end.x,
+                end.y
             );
             CTX.stroke();
         }
@@ -274,6 +333,26 @@ function lerp(A,B,t){
     return A+(B-A)*t;
 }
 
+// Berechnet den Schnittpunkt zweier Geraden mittels Vektoren, wobei die erste Gerade aus den Punkten A, B besteht
+function getIntersection(A,B,C,D){ 
+    const tTop=(D.x-C.x)*(A.y-C.y)-(D.y-C.y)*(A.x-C.x);
+    const uTop=(C.y-A.y)*(A.x-B.x)-(C.x-A.x)*(A.y-B.y);
+    const bottom=(D.y-C.y)*(B.x-A.x)-(D.x-C.x)*(B.y-A.y);
+    
+    if(bottom!=0){
+        const t=tTop/bottom;
+        const u=uTop/bottom;
+        if(t>=0 && t<=1 && u>=0 && u<=1){
+            return {
+                x:lerp(A.x,B.x,t),
+                y:lerp(A.y,B.y,t),
+                offset:t
+            }
+        }
+    }
+    return null;
+}
+
 //#endregion Funktionen
 
 
@@ -287,7 +366,9 @@ const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75);
 // Gameloop
 animate();
 function animate(){
-    auto.update();
+
+    // Auto Daten je Frame aktualisieren
+    auto.update(straße.borders); // übergabe der Straßenränder, für Collision Detection
 
     CANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
 
