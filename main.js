@@ -218,6 +218,7 @@ function lerp(A,B,t){
 
 
 
+
 //#region Main
 
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
@@ -228,14 +229,25 @@ animate();
 function animate(){
     auto.update();
 
-    CANVAS.height = window.innerHeight; // anstatt "clearRect"
+    CANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
+
+
+    // Nur das Zeichen der Straße und des Autos werden um x,y verschoben
+    CTX.save();
+    CTX.translate(0,-auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet
     
     straße.draw();
     auto.draw();
+
+    CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet
+    
+    
+
     requestAnimationFrame(animate);
 }
 
 //#endregion Main
+
 
 
 
