@@ -73,10 +73,12 @@ class Car {
         this.maxYspeed = 3;
         this.friction = 0.03;
         this.controller = new Controller();
+        this.sensor = new Sensor(this);
     }
 
     update(){
         this.#move();
+        this.sensor.update();
     }
 
     #move(){
@@ -137,6 +139,9 @@ class Car {
         CTX.fillText(ySpeedText, -textWidth / 2, 0); // Zeichne den Text "Auto" in der Mitte des Autos
 
         CTX.restore(); //für das translate(), alles bis hier hin wird gedreht
+
+        // Sensor mit Rays zeichnen
+        this.sensor.draw();
     }
 }//endOf Car
 
@@ -202,6 +207,52 @@ class Road{
     }
 }//endOf Road
 
+class Sensor{
+    constructor(auto){
+        this.auto = auto;
+        this.rayCount = 3; //anz der "Fühler" pro Sensor
+        this.rayLength = 100; //der Sensor kann nur in einem Radius von 100px "Sehen"
+        this.raySpread = Math.PI / 4; //45° alle Rays befinden sich in diesem Bereich
+        this.rays = [];
+    }
+
+    update(){
+        this.rays = []; // in jedem Frame, werden die Rays resetet
+
+        for(let i=0; i < this.rayCount; i++){
+            const rayAngle = lerp(this.raySpread/2, -this.raySpread/2, i/(this.rayCount-1));
+
+            const start = { // jeder Ray startet in der Mitte des Autos
+                x : this.auto.x, 
+                y : this.auto.y
+            }; 
+            const end = {
+                x : this.auto.x - Math.sin(rayAngle) * this.rayLength,
+                y : this.auto.y - Math.cos(rayAngle) * this.rayLength
+            };
+            // berechneten Ray als Array dem rays-Array adden, weil wir es schon bei den Borders so gemacht haben und consistency in unserem Code wollen
+            this.rays.push([start, end])
+        }
+    }
+
+    draw(){
+        for(let i=0; i < this.rayCount; i++){
+            CTX.beginPath();
+            CTX.lineWidth = 2;
+            CTX.strokeStyle = "yellow";
+            CTX.moveTo( // [i][0] x von einem Ray
+                this.rays[i][0].x, 
+                this.rays[i][0].y
+            );
+            CTX.lineTo( // [i][1] ist y von einem Ray
+                this.rays[i][1].x,
+                this.rays[i][1].y
+            );
+            CTX.stroke();
+        }
+    }
+}//endOf Sensor
+
 
 //#endregion Klassen
 
@@ -231,18 +282,16 @@ function animate(){
 
     CANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
 
-
     // Nur das Zeichen der Straße und des Autos werden um x,y verschoben
-    CTX.save();
-    CTX.translate(0,-auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet
-    
+    CTX.save(); // speichern des Canvas-Stacks bis jetzt
+
+    CTX.translate(0, - auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
+
     straße.draw();
     auto.draw();
 
-    CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet
+    CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
-    
-
     requestAnimationFrame(animate);
 }
 
