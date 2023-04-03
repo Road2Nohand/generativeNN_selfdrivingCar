@@ -212,13 +212,17 @@ class Road{
 class Sensor{
     constructor(auto){
         this.auto = auto;
-        this.rayCount = 6; //anz der "Fühler" pro Sensor
+        this.rayCount = 7; //anz der "Fühler" pro Sensor
         this.rayLength = 300; //der Sensor kann nur in einem Radius von 100px "Sehen"
         this.raySpread = Math.PI / 2; //90° alle Rays befinden sich in diesem Bereich
         this.rays = [];
     }
 
     update(){
+        this.#castRays();
+    }
+
+    #castRays(){
         this.rays = []; // in jedem Frame, werden die Rays resetet
 
         for(let i=0; i < this.rayCount; i++){
