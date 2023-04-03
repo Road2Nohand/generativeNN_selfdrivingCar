@@ -326,7 +326,7 @@ class Sensor{
 
 
 
-//#region Funktionen
+//#region Utility-Functions
 
 // Lineare Interpolierungs Hilfs-Funktion
 function lerp(A,B,t){
@@ -334,6 +334,7 @@ function lerp(A,B,t){
 }
 
 // Berechnet den Schnittpunkt zweier Geraden mittels Vektoren, wobei die erste Gerade aus den Punkten A, B besteht
+// Tutorial dafür: https://www.youtube.com/watch?v=fHOLQJo0FjQ&ab_channel=RaduMariescu-Istodor
 function getIntersection(A,B,C,D){ 
     const tTop=(D.x-C.x)*(A.y-C.y)-(D.y-C.y)*(A.x-C.x);
     const uTop=(C.y-A.y)*(A.x-B.x)-(C.x-A.x)*(A.y-B.y);
@@ -353,7 +354,7 @@ function getIntersection(A,B,C,D){
     return null;
 }
 
-//#endregion Funktionen
+//#endregionUtility-Functions
 
 
 
