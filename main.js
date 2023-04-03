@@ -208,12 +208,13 @@ class Road{
     }
 }//endOf Road
 
+
 class Sensor{
     constructor(auto){
         this.auto = auto;
-        this.rayCount = 3; //anz der "Fühler" pro Sensor
-        this.rayLength = 200; //der Sensor kann nur in einem Radius von 100px "Sehen"
-        this.raySpread = Math.PI / 4; //45° alle Rays befinden sich in diesem Bereich
+        this.rayCount = 6; //anz der "Fühler" pro Sensor
+        this.rayLength = 300; //der Sensor kann nur in einem Radius von 100px "Sehen"
+        this.raySpread = Math.PI / 2; //90° alle Rays befinden sich in diesem Bereich
         this.rays = [];
     }
 
@@ -221,7 +222,11 @@ class Sensor{
         this.rays = []; // in jedem Frame, werden die Rays resetet
 
         for(let i=0; i < this.rayCount; i++){
-            const rayAngle = lerp(this.raySpread/2, -this.raySpread/2, i/(this.rayCount-1));
+            const rayAngle = this.auto.angle + lerp(
+                this.raySpread/2, 
+                -this.raySpread/2, 
+                this.rayCount==1 ? 0.5 : i/(this.rayCount-1) // fix falls wir nur einen Ray haben wollen
+                );
 
             const start = { // jeder Ray startet in der Mitte des Autos
                 x : this.auto.x, 
@@ -253,7 +258,6 @@ class Sensor{
         }
     }
 }//endOf Sensor
-
 
 //#endregion Klassen
 
