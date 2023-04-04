@@ -79,9 +79,11 @@ class Car {
     }
 
     update(roadBorders){
-        this.#move();
-        this.polygon = this.#createPolygon();
-        this.damaged = this.#damageDetection(roadBorders);
+        if(!this.damaged){
+            this.#move();
+            this.polygon = this.#createPolygon();
+            this.damaged = this.#damageDetection(roadBorders);
+        }
         this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
     }
 
@@ -169,6 +171,7 @@ class Car {
         // Neue Auto zeichnen Methode mit #createPolygon
         if(this.damaged){
             CTX.fillStyle = 'red';
+            CTX.globalAlpha = 0.3;
         }
         else {
             CTX.fillStyle = 'black';
@@ -187,7 +190,7 @@ class Car {
         // CTX.fill();
 
         CTX.font = '24px Calibri';
-        CTX.fillStyle = 'white';
+        CTX.fillStyle = 'gray';
         const ySpeedText = this.ySpeed.toFixed(2);
         const textWidth = CTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen 
         CTX.fillText(ySpeedText, this.x - textWidth/2, this.y + 6); // Zeichne den Text "Auto" in der Mitte des Autos
@@ -446,6 +449,11 @@ function animate(){
     CTX.translate(0, - auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
 
     straße.draw();
+
+    if(auto.damaged){
+        console.log("tot!");
+    }
+
     auto.draw();
 
     CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
