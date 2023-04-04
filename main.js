@@ -72,7 +72,7 @@ class Controller {
 
 
 class Car {
-    constructor(x, y ,width, height, controlType){
+    constructor(x, y ,width, height, controlType, maxYspeed=3){
         this.x = x;
         this.y = y;
         this.width = width;
@@ -80,10 +80,12 @@ class Car {
         this.ySpeed = 0;
         this.angle = 0;
         this.acceleration = 0.1;
-        this.maxYspeed = 3;
+        this.maxYspeed = maxYspeed;
         this.friction = 0.03;
         this.controller = new Controller(controlType);
-        this.sensor = new Sensor(this);
+        if(controlType != "DUMMY"){
+            this.sensor = new Sensor(this);
+        }
         this.polygon = [];
         this.damaged = false;
     }
@@ -94,7 +96,9 @@ class Car {
             this.polygon = this.#createPolygon();
             this.damaged = this.#damageDetection(roadBorders);
         }
-        this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
+        if(this.sensor){
+            this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
+        }
     }
 
     #damageDetection(roadBorders){
@@ -176,7 +180,9 @@ class Car {
         CTX.save()
 
         // Sensor mit Rays zeichnen
-        this.sensor.draw();
+        if(this.sensor){
+            this.sensor.draw();
+        }   
 
         // Neue Auto zeichnen Methode mit #createPolygon
         if(this.damaged){
@@ -442,7 +448,7 @@ function polysIntersect(poly1, poly2) {
 //#region Main
 
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
-const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "KEYS");
+const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "KEYS", 4);
 const verkehr = [new Car(straße.getLaneCenter(2), CANVAS.height/3, 50, 75, "DUMMY")];
 
 // Gameloop
