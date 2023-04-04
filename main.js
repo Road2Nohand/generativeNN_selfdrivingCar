@@ -155,22 +155,27 @@ class Car {
         // Sensor mit Rays zeichnen
         this.sensor.draw();
 
-        CTX.translate(this.x, this.y) //gibt an zu welchen Punkt wir gehen wollen
-        CTX.rotate(-this.angle)
-
+        // Neue Auto zeichnen Methode mit #createPolygon
         CTX.beginPath();
-        CTX.rect(-this.width/2, -this.height/2, this.width, this.height);
-        CTX.fillStyle = 'black';
+        CTX.strokeStyle = 'black';
+        CTX.moveTo(this.polygon[0].x, this.polygon[0].y);
+        for(let i=1; i < this.polygon.length; i++){
+            CTX.lineTo(this.polygon[i].x, this.polygon[i].y);
+        }
         CTX.fill();
 
-        // ySpeed in die Mitte des Autos
+        // Alte Auto zeichnen Methode mit rect() 
+        
+        // CTX.beginPath();
+        // CTX.rect(-this.width/2, -this.height/2, this.width, this.height);
+        // CTX.fillStyle = 'black';
+        // CTX.fill();
+
         CTX.font = '24px Calibri';
         CTX.fillStyle = 'white';
         const ySpeedText = this.ySpeed.toFixed(2);
-        const textWidth = CTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen        
-        CTX.fillText(ySpeedText, -textWidth / 2, 0); // Zeichne den Text "Auto" in der Mitte des Autos
-
-        CTX.restore(); //für das translate(), alles bis hier hin wird gedreht
+        const textWidth = CTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen 
+        CTX.fillText(ySpeedText, this.x - textWidth/2, this.y + 6); // Zeichne den Text "Auto" in der Mitte des Autos
     }
 }//endOf Car
 
