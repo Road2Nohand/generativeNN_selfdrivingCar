@@ -75,12 +75,23 @@ class Car {
         this.controller = new Controller();
         this.sensor = new Sensor(this);
         this.polygon = [];
+        this.damaged = false;
     }
 
     update(roadBorders){
         this.#move();
         this.polygon = this.#createPolygon();
+        this.damaged = this.#damageDetection(roadBorders);
         this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
+    }
+
+    #damageDetection(roadBorders){
+        for(let i=0; i < roadBorders.length; i++){
+            if(polysIntersect(this.polygon, roadBorders[i]) ){
+                return true;
+            }
+        }
+        return false;
     }
 
     // Für die Collision Detection müssen die 4 Punkte des Autos gefunden werden
@@ -156,8 +167,13 @@ class Car {
         this.sensor.draw();
 
         // Neue Auto zeichnen Methode mit #createPolygon
+        if(this.damaged){
+            CTX.fillStyle = 'red';
+        }
+        else {
+            CTX.fillStyle = 'black';
+        }
         CTX.beginPath();
-        CTX.strokeStyle = 'black';
         CTX.moveTo(this.polygon[0].x, this.polygon[0].y);
         for(let i=1; i < this.polygon.length; i++){
             CTX.lineTo(this.polygon[i].x, this.polygon[i].y);
@@ -165,7 +181,6 @@ class Car {
         CTX.fill();
 
         // Alte Auto zeichnen Methode mit rect() 
-        
         // CTX.beginPath();
         // CTX.rect(-this.width/2, -this.height/2, this.width, this.height);
         // CTX.fillStyle = 'black';
@@ -366,7 +381,6 @@ function lerp(A,B,t){
     return A+(B-A)*t;
 }
 
-// Collision Detection Util Funktion
 // Berechnet den Schnittpunkt zweier Geraden mittels Vektoren, wobei die erste Gerade aus den Punkten A, B besteht usw.
 // Tutorial dafür: https://www.youtube.com/watch?v=fHOLQJo0FjQ&ab_channel=RaduMariescu-Istodor
 function getIntersection(A,B,C,D){ 
@@ -386,6 +400,25 @@ function getIntersection(A,B,C,D){
         }
     }
     return null;
+}
+
+// Collision Detection Util Funktion für Polygone
+function polysIntersect(poly1, poly2) {
+    for(let i=0; i < poly1.length; i++){
+        for(let j=0; j < poly2.length; j++){
+            //workaround mit Modulo um index out of bounds zu vermeiden
+            const touch = getIntersection(
+                poly1[i],
+                poly1[(i+1)%poly1.length], 
+                poly2[j],
+                poly2[(j+1)%poly2.length]
+            );
+            if(touch){
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 //#endregionUtility-Functions
