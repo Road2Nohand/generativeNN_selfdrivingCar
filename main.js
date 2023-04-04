@@ -74,11 +74,39 @@ class Car {
         this.friction = 0.03;
         this.controller = new Controller();
         this.sensor = new Sensor(this);
+        this.polygon = [];
     }
 
     update(roadBorders){
         this.#move();
+        this.polygon = this.#createPolygon();
         this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
+    }
+
+    // Für die Collision Detection müssen die 4 Punkte des Autos gefunden werden
+    #createPolygon(){
+        const points = []; // Man könnte auch mehr als 4 Punkte habe "Poly"-Gon
+        // Trigonometrie mit Hypothenuse um den Abstand von der Mitte des Rechtecks zu einem Punkt zu berechnen (also Length der Diagonalen)
+        const rad = Math.hypot(this.width, this.height) / 2; // 1. Winkel für Punktberechnung
+        const alpha = Math.atan2(this.width, this.height); // 2. Winkel für Punktberechnung
+        // Punkt oben Rechts
+        points.push({
+            x : this.x - Math.sin(this.angle - alpha) * rad,
+            y : this.y - Math.cos(this.angle - alpha) * rad
+        });
+        points.push({ // oben links
+            x : this.x - Math.sin(this.angle + alpha) * rad,
+            y : this.y - Math.cos(this.angle + alpha) * rad
+        });
+        points.push({ // unten rechts
+            x : this.x - Math.sin(Math.PI + this.angle - alpha) * rad,
+            y : this.y - Math.cos(Math.PI + this.angle - alpha) * rad
+        });
+        points.push({ // unten links
+            x : this.x - Math.sin(Math.PI + this.angle + alpha) * rad,
+            y : this.y - Math.cos(Math.PI + this.angle + alpha) * rad
+        });
+        return points;
     }
 
     #move(){
@@ -333,7 +361,8 @@ function lerp(A,B,t){
     return A+(B-A)*t;
 }
 
-// Berechnet den Schnittpunkt zweier Geraden mittels Vektoren, wobei die erste Gerade aus den Punkten A, B besteht
+// Collision Detection Util Funktion
+// Berechnet den Schnittpunkt zweier Geraden mittels Vektoren, wobei die erste Gerade aus den Punkten A, B besteht usw.
 // Tutorial dafür: https://www.youtube.com/watch?v=fHOLQJo0FjQ&ab_channel=RaduMariescu-Istodor
 function getIntersection(A,B,C,D){ 
     const tTop=(D.x-C.x)*(A.y-C.y)-(D.y-C.y)*(A.x-C.x);
