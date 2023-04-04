@@ -12,12 +12,22 @@ const CTX = CANVAS.getContext("2d");
 //#region Klassen
 
 class Controller {
-    constructor(){
+    constructor(controlType){
         this.forward = false;
         this.left = false;
         this.right = false;
         this.reverse = false;
-        this.#addKeyboardListener();
+
+        // wenn es ein Dummy ist, soll er keine KeyListener bekommen
+        switch(controlType){
+            case "KEYS":
+                this.#addKeyboardListener();
+                break;
+            case "DUMMY":
+                this.forward = true;
+                break;
+        }
+        
     }
 
     // private Methode
@@ -62,7 +72,7 @@ class Controller {
 
 
 class Car {
-    constructor(x, y ,width, height){
+    constructor(x, y ,width, height, controlType){
         this.x = x;
         this.y = y;
         this.width = width;
@@ -72,7 +82,7 @@ class Car {
         this.acceleration = 0.1;
         this.maxYspeed = 3;
         this.friction = 0.03;
-        this.controller = new Controller();
+        this.controller = new Controller(controlType);
         this.sensor = new Sensor(this);
         this.polygon = [];
         this.damaged = false;
@@ -432,7 +442,8 @@ function polysIntersect(poly1, poly2) {
 //#region Main
 
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
-const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75);
+const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "KEYS");
+const verkehr = [new Car(straße.getLaneCenter(2), CANVAS.height/3, 50, 75, "DUMMY")];
 
 // Gameloop
 animate();
@@ -440,6 +451,8 @@ function animate(){
 
     // Auto Daten je Frame aktualisieren
     auto.update(straße.borders); // übergabe der Straßenränder, für Collision Detection
+    // Verkehr updaten
+    verkehr.forEach(gegner => {gegner.update(straße.borders)} );
 
     CANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
 
@@ -449,12 +462,9 @@ function animate(){
     CTX.translate(0, - auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
 
     straße.draw();
-
-    if(auto.damaged){
-        console.log("tot!");
-    }
-
     auto.draw();
+    verkehr.forEach(gegner => {gegner.draw()});
+
 
     CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
