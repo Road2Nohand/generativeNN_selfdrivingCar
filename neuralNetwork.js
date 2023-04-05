@@ -2,7 +2,7 @@ class NeuralNetwork {
     constructor(anzNeuronenJeLayer){
         this.denseLayers = [];
         for(let i=0; i < anzNeuronenJeLayer; i++){
-            this.denseLayers.push(new DenseLayer(anzNeuronenJeLayer[i], anzNeuronenJeLayer[i+1]) );
+            this.denseLayers.push(new DenseLayer(anzNeuronenJeLayer[i], anzNeuronenJeLayer[i+1]) ); // i+1 ergibt beim letzten Layer ein leeres Array mit [undefined]
         }
     }
 
