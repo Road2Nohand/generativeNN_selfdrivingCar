@@ -1,10 +1,15 @@
 //#region Gobals
 
-const CANVAS = document.getElementById("carCanvas");
-CANVAS.height = window.innerHeight;
-CANVAS.width = 400;
-const CTX = CANVAS.getContext("2d");
+// car Canvas
+const carCANVAS = document.getElementById("carCanvas");
+carCANVAS.height = window.innerHeight;
+carCANVAS.width = 400;
+const carCTX = carCANVAS.getContext("2d");
 
+// nn Canvas
+const nnCANVAS = document.getElementById("nnCanvas");
+nnCANVAS.width = 800;
+const nnCTX = nnCANVAS.getContext("2d");
 //#endregionGlobals
 
 
@@ -208,7 +213,7 @@ class Car {
     }
 
     draw(carColor){
-        CTX.save()
+        carCTX.save()
 
         // Sensor mit Rays zeichnen
         if(this.sensor){
@@ -217,26 +222,26 @@ class Car {
 
         // Neue Auto zeichnen Methode mit #createPolygon
         if(this.damaged){
-            CTX.fillStyle = 'red';
-            CTX.globalAlpha = 0.3;
+            carCTX.fillStyle = 'red';
+            carCTX.globalAlpha = 0.3;
         }
         else {
-             CTX.fillStyle = carColor;
-             CTX.globalAlpha = 1;
+             carCTX.fillStyle = carColor;
+             carCTX.globalAlpha = 1;
         }
 
-        CTX.beginPath();
-        CTX.moveTo(this.polygon[0].x, this.polygon[0].y);
+        carCTX.beginPath();
+        carCTX.moveTo(this.polygon[0].x, this.polygon[0].y);
         for(let i=1; i < this.polygon.length; i++){
-            CTX.lineTo(this.polygon[i].x, this.polygon[i].y);
+            carCTX.lineTo(this.polygon[i].x, this.polygon[i].y);
         }
-        CTX.fill();
+        carCTX.fill();
 
-        CTX.font = '24px Calibri';
-        CTX.fillStyle = 'gray';
+        carCTX.font = '24px Calibri';
+        carCTX.fillStyle = 'gray';
         const ySpeedText = this.ySpeed.toFixed(2);
-        const textWidth = CTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen 
-        CTX.fillText(ySpeedText, this.x - textWidth/2, this.y + 6); // Zeichne den Text "Auto" in der Mitte des Autos
+        const textWidth = carCTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen 
+        carCTX.fillText(ySpeedText, this.x - textWidth/2, this.y + 6); // Zeichne den Text "Auto" in der Mitte des Autos
     }
 }//endOf Car
 
@@ -272,8 +277,8 @@ class Road{
     }
 
     draw(){
-        CTX.lineWidth = 5;
-        CTX.strokeStyle = "white";
+        carCTX.lineWidth = 5;
+        carCTX.strokeStyle = "white";
 
         // i Lanes in gleichem Abstand zeichnen
         for(let i=1; i<=this.laneCount-1; i++){
@@ -281,23 +286,23 @@ class Road{
             const x = lerp(this.xLeft, this.xRight, i/this.laneCount); 
 
             // mittlere Linien weiß und gestrichelt
-            CTX.strokeStyle = "white";
-            CTX.setLineDash([30, 30]);
+            carCTX.strokeStyle = "white";
+            carCTX.setLineDash([30, 30]);
 
-            CTX.beginPath();
-            CTX.moveTo(x, this.top);
-            CTX.lineTo(x, this.bottom);
-            CTX.stroke();
+            carCTX.beginPath();
+            carCTX.moveTo(x, this.top);
+            carCTX.lineTo(x, this.bottom);
+            carCTX.stroke();
         }
 
         // Straßenrand in grau und durchgezogen
         this.borders.forEach(border => { // geht die Border-Arrays durch
-            CTX.strokeStyle = "gray";
-            CTX.setLineDash([]);
-            CTX.beginPath();
-            CTX.moveTo(border[0].x, border[0].y); // erster Punkt der Border
-            CTX.lineTo(border[1].x, border[1].y); // zweiter Punkt 
-            CTX.stroke();
+            carCTX.strokeStyle = "gray";
+            carCTX.setLineDash([]);
+            carCTX.beginPath();
+            carCTX.moveTo(border[0].x, border[0].y); // erster Punkt der Border
+            carCTX.lineTo(border[1].x, border[1].y); // zweiter Punkt 
+            carCTX.stroke();
         });
     }
 }//endOf Road
@@ -406,32 +411,32 @@ class Sensor{
             }
 
             // zeichnen bis zur Collision
-            CTX.beginPath();
-            CTX.lineWidth = 2;
-            CTX.strokeStyle = "yellow";
-            CTX.moveTo( // [i][0] x von einem Ray
+            carCTX.beginPath();
+            carCTX.lineWidth = 2;
+            carCTX.strokeStyle = "yellow";
+            carCTX.moveTo( // [i][0] x von einem Ray
                 this.rays[i][0].x, 
                 this.rays[i][0].y
             );
-            CTX.lineTo( // [i][1] ist y von einem Ray
+            carCTX.lineTo( // [i][1] ist y von einem Ray
                 end.x,
                 end.y
             );
-            CTX.stroke();
+            carCTX.stroke();
 
             // zeichnen des Stücks nach einer Collision
-            CTX.beginPath();
-            CTX.lineWidth = 2;
-            CTX.strokeStyle = "red";
-            CTX.moveTo( // [i][0] x von einem Ray
+            carCTX.beginPath();
+            carCTX.lineWidth = 2;
+            carCTX.strokeStyle = "red";
+            carCTX.moveTo( // [i][0] x von einem Ray
                 this.rays[i][1].x, 
                 this.rays[i][1].y
             );
-            CTX.lineTo( // [i][1] ist y von einem Ray
+            carCTX.lineTo( // [i][1] ist y von einem Ray
                 end.x,
                 end.y
             );
-            CTX.stroke();
+            carCTX.stroke();
         }
     }
 }//endOf Sensor
@@ -494,18 +499,19 @@ function polysIntersect(poly1, poly2) {
 
 //#region Main
 
-const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
-const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "AI", 4);
+const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
+const auto = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4);
 // Gegner Array
 const verkehr = [
-    new Car(straße.getLaneCenter(2), CANVAS.height/3, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(3), CANVAS.height/2, 50, 200, "DUMMY")
+    new Car(straße.getLaneCenter(2), carCANVAS.height/3, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(3), carCANVAS.height/2, 50, 200, "DUMMY")
 ];
 
 // Gameloop
 animate();
 function animate(){
-    CANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
+    carCANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
+    nnCANVAS.height = window.innerHeight * 0.8;
 
     // Auto Daten je Frame aktualisieren
     auto.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
@@ -514,15 +520,15 @@ function animate(){
 
 
     // Nur das Zeichen der Straße und des Autos werden um x,y verschoben
-    CTX.save(); // speichern des Canvas-Stacks bis jetzt
+    carCTX.save(); // speichern des Canvas-Stacks bis jetzt
 
-    CTX.translate(0, - auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
+    carCTX.translate(0, - auto.y + carCANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
 
     straße.draw();
     verkehr.forEach(gegner => {gegner.draw("rgb(69, 77, 63)")});
     auto.draw("black");
 
-    CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
+    carCTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
 
     requestAnimationFrame(animate);
@@ -537,7 +543,7 @@ function animate(){
 
 // wenn man die Fenster-Größe verändert
 window.addEventListener("resize", () => {
-    CANVAS.height = window.innerHeight;
+    carCANVAS.height = window.innerHeight;
 });
 
 //#endregion EventListener
