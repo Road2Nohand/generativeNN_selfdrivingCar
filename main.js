@@ -83,27 +83,32 @@ class Car {
         this.maxYspeed = maxYspeed;
         this.friction = 0.03;
         this.controller = new Controller(controlType);
-        if(controlType != "DUMMY"){
+        if(controlType == "KEYS"){
             this.sensor = new Sensor(this);
         }
         this.polygon = [];
         this.damaged = false;
     }
 
-    update(roadBorders){
+    update(roadBorders, verkehr){
         if(!this.damaged){
             this.#move();
             this.polygon = this.#createPolygon();
-            this.damaged = this.#damageDetection(roadBorders);
+            this.damaged = this.#damageDetection(roadBorders, verkehr);
         }
         if(this.sensor){
             this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
         }
     }
 
-    #damageDetection(roadBorders){
+    #damageDetection(roadBorders, verkehr){
         for(let i=0; i < roadBorders.length; i++){
             if(polysIntersect(this.polygon, roadBorders[i]) ){
+                return true;
+            }
+        }
+        for(let i=0; i < verkehr.length; i++){
+            if(polysIntersect(this.polygon, verkehr[i].polygon) ){
                 return true;
             }
         }
@@ -449,18 +454,19 @@ function polysIntersect(poly1, poly2) {
 
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
 const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "KEYS", 4);
+// Gegner Array
 const verkehr = [new Car(straße.getLaneCenter(2), CANVAS.height/3, 50, 75, "DUMMY")];
 
 // Gameloop
 animate();
 function animate(){
+    CANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
 
     // Auto Daten je Frame aktualisieren
-    auto.update(straße.borders); // übergabe der Straßenränder, für Collision Detection
+    auto.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     // Verkehr updaten
-    verkehr.forEach(gegner => {gegner.update(straße.borders)} );
+    verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
 
-    CANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
 
     // Nur das Zeichen der Straße und des Autos werden um x,y verschoben
     CTX.save(); // speichern des Canvas-Stacks bis jetzt
@@ -471,9 +477,9 @@ function animate(){
     auto.draw();
     verkehr.forEach(gegner => {gegner.draw()});
 
-
     CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
+
     requestAnimationFrame(animate);
 }
 
