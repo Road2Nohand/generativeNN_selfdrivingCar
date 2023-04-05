@@ -8,7 +8,7 @@ Dieses Projekt ist stark inspiriert von Dr. Radu Mariescu-Istodo und dem offizie
 
 Der NEAT-Algorithmus verwendet sowohl die Struktur als auch die Gewichtungen der Verbindungen zwischen Neuronen, um optimale neuronale Netze für ein bestimmtes Problem zu entwickeln. Im Gegensatz zu anderen Neuroevolutionsansätzen, die entweder die Struktur oder die Gewichte der Netzwerke verändern, kombiniert NEAT beide Ansätze. Eine Besonderheit von NEAT ist die Verwendung eines "historischen Markierungssystems" (genannt Gene History), um das Problem des konkurrierenden Zusammenführens von Spezies (engl. "competing conventions problem") während der Kreuzung von verschiedenen Netzwerkstrukturen zu lösen.
 
-Die Hauptbeiträge des Papiers sind:
+Die Hauptbeiträge des Papers sind:
 
 1. Eine Methode, um die Evolution von Netzwerkstrukturen zu ermöglichen, indem neue Knoten und Verbindungen schrittweise eingeführt werden.
 2. Die Einführung eines historischen Markierungssystems (Gene History), das es ermöglicht, unterschiedliche Netzwerkstrukturen effektiv zu kreuzen, indem es Genomähnlichkeiten aufgrund ihrer historischen Herkunft erkennt.
