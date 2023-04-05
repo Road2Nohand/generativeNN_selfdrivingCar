@@ -97,7 +97,7 @@ class Car {
             this.damaged = this.#damageDetection(roadBorders, verkehr);
         }
         if(this.sensor){
-            this.sensor.update(roadBorders); //damit Sensoren Collision berechnen können
+            this.sensor.update(roadBorders, verkehr); //damit Sensoren Collision berechnen können
         }
     }
 
@@ -291,19 +291,19 @@ class Sensor{
         this.readings = []; //beinhaltet die Messungen der Rays (Entfernung zu einer Border)
     }
 
-    update(roadBorders){
+    update(roadBorders, verkehr){
         this.#castRays();
         
         this.readings = []; // Messungen der Sensoren werden jedes Frame geleert/aktualisiert
 
         this.rays.forEach(ray => { // pushen eines Readings je Ray
-            this.readings.push(this.#getReading(ray, roadBorders)); 
+            this.readings.push(this.#getReading(ray, roadBorders, verkehr)); 
         });
 
 
     }
 
-    #getReading(ray, roadBorders){  // messen wo der ray eine Border trifft
+    #getReading(ray, roadBorders, verkehr){  // messen wo der ray eine Border trifft
         let touches = []; // Schnittpunkte des Rays
         
         // prüfe für jede Border ob es Schnittpunkte gibt mit dem aktuellen ray
@@ -320,6 +320,25 @@ class Sensor{
                 touches.push(touch); // wenn es keine touches gibt, bleibt das Array einfach leer
             }
         }
+
+        // prüfe Intersections für jeden Dummy mit aktuellem ray
+        for(let i=0; i < verkehr.length; i++) {
+            const carBorder = verkehr[i].polygon; // 4 (x,y) Koordinaten je Dummy
+            // da wir bei einem Dummy nicht wie bei einer Border nur eine Linie haben, müssen wir für alle 4 checken
+            for(let j=0; j< carBorder.length; j++){
+                const touch = getIntersection(
+                    ray[0], // start des aktuellen rays
+                    ray[1], // ende des aktuellen rays
+                    carBorder[j],
+                    carBorder[(j+1) % carBorder.length] 
+                );
+
+                if(touch){
+                    touches.push(touch);
+                }
+            }
+        }
+
         // wenn keine touches
         if(touches.length == 0){
             return null;
@@ -340,8 +359,9 @@ class Sensor{
                 -this.raySpread/2, 
                 this.rayCount==1 ? 0.5 : i/(this.rayCount-1) // fix falls wir nur einen Ray haben wollen
                 );
-
-            const start = { // jeder Ray startet in der Mitte des Autos
+            
+            // jeder Ray startet in der Mitte des Autos
+            const start = { 
                 x : this.auto.x, 
                 y : this.auto.y
             }; 
@@ -433,7 +453,7 @@ function polysIntersect(poly1, poly2) {
             //workaround mit Modulo um index out of bounds zu vermeiden
             const touch = getIntersection(
                 poly1[i],
-                poly1[(i+1)%poly1.length], 
+                poly1[(i+1)%poly1.length], // mit dem Modulo bekommen wir wieder den ersten Punkt cuz 4 % 4 = 0
                 poly2[j],
                 poly2[(j+1)%poly2.length]
             );
