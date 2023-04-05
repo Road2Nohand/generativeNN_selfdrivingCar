@@ -1,3 +1,27 @@
+//#region Header
+/* 
+    Autor: Niklas Mickelat inspiriert bei Dr. Radu Mariescu-Istodo
+    Date: 05/04/2023
+
+    Description:
+
+        NEAT : Neural Evolution of Augmenting Topologies
+        https://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf 
+
+        Mit diesem 2D-Canvas Projekt wird der NEAT Algorithmus veranschaulicht.
+        Er wurde von Kenneth O. Stanley und Risto Miikkulainen entwickelt und erstmals im Jahr 2002 im wissenschaftlichen Artikel "Evolving Neural Networks through Augmenting Topologies" vorgestellt.
+
+        Der NEAT-Algorithmus verwendet sowohl die Struktur als auch die Gewichtungen der Verbindungen zwischen Neuronen, 
+        um optimale neuronale Netze für ein bestimmtes Problem zu entwickeln. Im Gegensatz zu anderen Neuroevolutionsansätzen, 
+        die entweder die Struktur oder die Gewichte der Netzwerke verändern, kombiniert NEAT beide Ansätze. 
+        Eine Besonderheit von NEAT ist die Verwendung eines "historischen Markierungssystems" (genannt Gene History), 
+        um das Problem des konkurrierenden Zusammenführens von Spezies (engl. "competing conventions problem") 
+        während der Kreuzung von verschiedenen Netzwerkstrukturen zu lösen.
+*/
+//#endregion Header
+
+
+
 //#region Gobals
 
 // car Canvas
