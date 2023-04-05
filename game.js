@@ -110,6 +110,9 @@ class Car {
             // Abstände von Rays zu Collisions an Brain Inputs geben, ansonsten 0 
             // 1 - Abstand, weil die Inputs sollen kleine Werte für weit Entferntes bekommen und Hohe für Nahes
             const offsets = this.sensor.readings.map(ray => ray == null ? 0 : 1-ray.offset); // ray.offset ist bereits im Bereich [0,1]
+            // Outputs vom Brain kriegen
+            const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+            console.log(outputs);
         }
     }
 
