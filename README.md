@@ -8,6 +8,17 @@ Dieses Projekt ist stark inspiriert von Dr. Radu Mariescu-Istodo und dem offizie
 
 Der NEAT-Algorithmus verwendet sowohl die Struktur als auch die Gewichtungen der Verbindungen zwischen Neuronen, um optimale neuronale Netze für ein bestimmtes Problem zu entwickeln. Im Gegensatz zu anderen Neuroevolutionsansätzen, die entweder die Struktur oder die Gewichte der Netzwerke verändern, kombiniert NEAT beide Ansätze. Eine Besonderheit von NEAT ist die Verwendung eines "historischen Markierungssystems" (genannt Gene History), um das Problem des konkurrierenden Zusammenführens von Spezies (engl. "competing conventions problem") während der Kreuzung von verschiedenen Netzwerkstrukturen zu lösen.
 
+Die Hauptbeiträge des Papiers sind:
+
+1. Eine Methode, um die Evolution von Netzwerkstrukturen zu ermöglichen, indem neue Knoten und Verbindungen schrittweise eingeführt werden.
+2. Die Einführung eines historischen Markierungssystems (Gene History), das es ermöglicht, unterschiedliche Netzwerkstrukturen effektiv zu kreuzen, indem es Genomähnlichkeiten aufgrund ihrer historischen Herkunft erkennt.
+3. Die Verwendung von Spezies, um die Vielfalt der Population aufrechtzuerhalten und das Problem der konkurrierenden Zusammenführung von Spezies zu lösen.
+In ihren Experimenten verglichen die Autoren NEAT mit anderen Neuroevolutionsansätzen, darunter fixe Topologien (FT), zufällige Topologien (RT) und die Evolution von Verbindungsgewichten und Topologien getrennt (WCCI). Die Ergebnisse zeigten, dass NEAT bessere Leistungen und eine schnellere Konvergenz erzielte als die anderen Ansätze.
+
+Das Paper zeigt auch, dass NEAT erfolgreich komplexe Steuerungsaufgaben lösen kann, wie zum Beispiel das doppelt aufgehängte Pendel (Double Pole Balancing) und das doppelt aufgehängte Pendel mit Markov-Entscheidungsprozessen (Double Pole Balancing with Markov Decision Processes).
+
+Insgesamt zeigt dieses Paper die Wirksamkeit des NEAT-Ansatzes in der Evolution künstlicher neuronaler Netze und legt den Grundstein für zukünftige Forschungen und Anwendungen in verschiedenen Bereichen der künstlichen Intelligenz und des maschinellen Lernens.
+
 ## Praxisanwendung
 
 NEAT wird heute in der Praxis in verschiedenen Bereichen eingesetzt, wie zum Beispiel:
