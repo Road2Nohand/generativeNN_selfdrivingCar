@@ -84,9 +84,17 @@ class Car {
         this.maxYspeed = maxYspeed;
         this.friction = 0.03;
         this.controller = new Controller(controlType);
-        if(controlType == "KEYS"){
+
+        // Wenn kein Dummy gib ihm Gehirn und Sensoren!
+        if(controlType != "DUMMY"){
             this.sensor = new Sensor(this);
+            this.brain = new NeuralNetwork([
+                    this.sensor.rayCount,
+                    6, // Hidden Neuronen
+                    4 // Anz. möglicher Aktionen des Agents
+                ]);
         }
+
         this.polygon = [];
         this.damaged = false;
     }
@@ -99,6 +107,9 @@ class Car {
         }
         if(this.sensor){
             this.sensor.update(roadBorders, verkehr); //damit Sensoren Collision berechnen können
+            // Abstände von Rays zu Collisions an Brain Inputs geben, ansonsten 0 
+            // 1 - Abstand, weil die Inputs sollen kleine Werte für weit Entferntes bekommen und Hohe für Nahes
+            const offsets = this.sensor.readings.map(ray => ray == null ? 0 : 1-ray.offset); // ray.offset ist bereits im Bereich [0,1]
         }
     }
 
