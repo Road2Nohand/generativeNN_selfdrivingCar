@@ -8,7 +8,7 @@ const carCTX = carCANVAS.getContext("2d");
 
 // nn Canvas
 const nnCANVAS = document.getElementById("nnCanvas");
-nnCANVAS.width = 800;
+nnCANVAS.width = window.innerWidth * 0.5;
 const nnCTX = nnCANVAS.getContext("2d");
 //#endregionGlobals
 
@@ -530,6 +530,8 @@ function animate(){
 
     carCTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
+    // NN zeichnen
+    Visualizer.drawNetwork(nnCTX, auto.brain);
 
     requestAnimationFrame(animate);
 }
