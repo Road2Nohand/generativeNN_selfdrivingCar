@@ -9,6 +9,7 @@ const CTX = CANVAS.getContext("2d");
 
 
 
+
 //#region Klassen
 
 class Controller {
@@ -493,8 +494,8 @@ function animate(){
     CTX.translate(0, - auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
 
     straße.draw();
+    verkehr.forEach(gegner => {gegner.draw("rgb(69, 77, 63)")});
     auto.draw("black");
-    verkehr.forEach(gegner => {gegner.draw("blue")});
 
     CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
