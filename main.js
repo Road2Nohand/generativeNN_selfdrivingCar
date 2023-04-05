@@ -72,7 +72,7 @@ class Controller {
 
 
 class Car {
-    constructor(x, y ,width, height, controlType, maxYspeed=3){
+    constructor(x, y ,width, height, controlType, maxYspeed=3,){
         this.x = x;
         this.y = y;
         this.width = width;
@@ -181,7 +181,7 @@ class Car {
         this.y-=Math.cos(this.angle)*this.ySpeed
     }
 
-    draw(){
+    draw(carColor){
         CTX.save()
 
         // Sensor mit Rays zeichnen
@@ -195,20 +195,16 @@ class Car {
             CTX.globalAlpha = 0.3;
         }
         else {
-            CTX.fillStyle = 'black';
+             CTX.fillStyle = carColor;
+             CTX.globalAlpha = 1;
         }
+
         CTX.beginPath();
         CTX.moveTo(this.polygon[0].x, this.polygon[0].y);
         for(let i=1; i < this.polygon.length; i++){
             CTX.lineTo(this.polygon[i].x, this.polygon[i].y);
         }
         CTX.fill();
-
-        // Alte Auto zeichnen Methode mit rect() 
-        // CTX.beginPath();
-        // CTX.rect(-this.width/2, -this.height/2, this.width, this.height);
-        // CTX.fillStyle = 'black';
-        // CTX.fill();
 
         CTX.font = '24px Calibri';
         CTX.fillStyle = 'gray';
@@ -475,7 +471,10 @@ function polysIntersect(poly1, poly2) {
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
 const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "KEYS", 4);
 // Gegner Array
-const verkehr = [new Car(straße.getLaneCenter(2), CANVAS.height/3, 50, 75, "DUMMY")];
+const verkehr = [
+    new Car(straße.getLaneCenter(2), CANVAS.height/3, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(3), CANVAS.height/2, 50, 200, "DUMMY")
+];
 
 // Gameloop
 animate();
@@ -494,8 +493,8 @@ function animate(){
     CTX.translate(0, - auto.y + CANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
 
     straße.draw();
-    auto.draw();
-    verkehr.forEach(gegner => {gegner.draw()});
+    auto.draw("black");
+    verkehr.forEach(gegner => {gegner.draw("blue")});
 
     CTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
