@@ -85,6 +85,8 @@ class Car {
         this.friction = 0.03;
         this.controller = new Controller(controlType);
 
+        this.useBrain = controlType == "AI";
+
         // Wenn kein Dummy gib ihm Gehirn und Sensoren!
         if(controlType != "DUMMY"){
             this.sensor = new Sensor(this);
@@ -107,12 +109,21 @@ class Car {
         }
         if(this.sensor){
             this.sensor.update(roadBorders, verkehr); //damit Sensoren Collision berechnen können
-            // Abstände von Rays zu Collisions an Brain Inputs geben, ansonsten 0 
+            
+            // Abstände als Inputs Brain geben, ansonsten 0
             // 1 - Abstand, weil die Inputs sollen kleine Werte für weit Entferntes bekommen und Hohe für Nahes
             const offsets = this.sensor.readings.map(ray => ray == null ? 0 : 1-ray.offset); // ray.offset ist bereits im Bereich [0,1]
+            
             // Outputs vom Brain kriegen
             const outputs = NeuralNetwork.feedForward(offsets, this.brain);
-            console.log(outputs);
+            
+            // Brain Controller geben
+            if(this.useBrain){
+                this.controller.forward = outputs[0]; // funktioniert weil outputs immer "0" oder "1" sind -> Binärere Klassifizierer
+                this.controller.left = outputs[1];
+                this.controller.right = outputs[2];
+                this.controller.reverse = outputs[3];
+            }
         }
     }
 
@@ -484,7 +495,7 @@ function polysIntersect(poly1, poly2) {
 //#region Main
 
 const straße = new Road(CANVAS.width/2, CANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
-const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "KEYS", 4);
+const auto = new Car(straße.getLaneCenter(1), CANVAS.height/2, 50, 75, "AI", 4);
 // Gegner Array
 const verkehr = [
     new Car(straße.getLaneCenter(2), CANVAS.height/3, 50, 75, "DUMMY"),
