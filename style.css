@@ -9,6 +9,12 @@ body {
     overflow: hidden; /*Für Scrollbars*/
 }
 
+h1 {
+    position: fixed;
+    margin-top: 10px;
+    margin-left: 45%;
+}
+
 #carCanvas {
     background: lightgray;
 }
