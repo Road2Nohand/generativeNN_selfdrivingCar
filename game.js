@@ -533,7 +533,7 @@ const verkehr = [
 
 // Gameloop
 animate();
-function animate(){
+function animate(time){
     carCANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
     nnCANVAS.height = window.innerHeight * 0.8;
 
@@ -545,7 +545,6 @@ function animate(){
 
     // Nur das Zeichen der Straße und des Autos werden um x,y verschoben
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
-
     carCTX.translate(0, - auto.y + carCANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
 
     straße.draw();
@@ -555,6 +554,7 @@ function animate(){
     carCTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
     // NN zeichnen
+    nnCTX.lineDashOffset = -time/50;
     Visualizer.drawNetwork(nnCTX, auto.brain);
 
     requestAnimationFrame(animate);
