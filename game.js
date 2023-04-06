@@ -102,7 +102,7 @@ class Controller {
 
 
 class Car {
-    constructor(x, y ,width, height, controlType, maxYspeed=3,){
+    constructor(x, y ,width, height, controlType, maxYspeed=3){
         this.x = x;
         this.y = y;
         this.width = width;
@@ -113,6 +113,7 @@ class Car {
         this.maxYspeed = maxYspeed;
         this.friction = 0.03;
         this.controller = new Controller(controlType);
+        this.controlType = controlType;
 
         this.useBrain = controlType == "AI";
 
@@ -236,22 +237,20 @@ class Car {
         this.y-=Math.cos(this.angle)*this.ySpeed
     }
 
-    draw(carColor){
+    draw(carColor, drawSensor=false, alpha=0.5){
         carCTX.save()
 
         // Sensor mit Rays zeichnen
-        if(this.sensor){
+        if(this.sensor && drawSensor){
             this.sensor.draw();
         }   
 
-        // Neue Auto zeichnen Methode mit #createPolygon
+        carCTX.fillStyle = carColor;
+        carCTX.globalAlpha = alpha;
+
         if(this.damaged){
             carCTX.fillStyle = 'red';
-            carCTX.globalAlpha = 0.3;
-        }
-        else {
-             carCTX.fillStyle = carColor;
-             carCTX.globalAlpha = 1;
+            carCTX.globalAlpha = 0.2;
         }
 
         carCTX.beginPath();
@@ -261,11 +260,13 @@ class Car {
         }
         carCTX.fill();
 
-        carCTX.font = '24px Calibri';
-        carCTX.fillStyle = 'gray';
-        const ySpeedText = this.ySpeed.toFixed(2);
-        const textWidth = carCTX.measureText(ySpeedText).width; // Messe die Breite des Textes, um ihn zentriert zu zeichnen 
-        carCTX.fillText(ySpeedText, this.x - textWidth/2, this.y + 6); // Zeichne den Text "Auto" in der Mitte des Autos
+        if(this.controlType != "DUMMY"){
+            carCTX.font = '24px Calibri';
+            carCTX.fillStyle = 'gray';
+            const ySpeedText = this.ySpeed.toFixed(2);
+            const textWidth = carCTX.measureText(ySpeedText).width;
+            carCTX.fillText(ySpeedText, this.x - textWidth/2, this.y + 6); // Zeichne den Text "Auto" in der Mitte des Autos
+        }
     }
 }//endOf Car
 
@@ -438,6 +439,7 @@ class Sensor{
             carCTX.beginPath();
             carCTX.lineWidth = 2;
             carCTX.strokeStyle = "yellow";
+            carCTX.globalAlpha = 1;
             carCTX.moveTo( // [i][0] x von einem Ray
                 this.rays[i][0].x, 
                 this.rays[i][0].y
@@ -516,15 +518,27 @@ function polysIntersect(poly1, poly2) {
     return false;
 }
 
-//#endregionUtility-Functions
+// mehrere nn Cars instanziieren
+function generateCars(n){
+    const cars = [];
+    for(let i=1; i <= n; i++){
+        cars.push(new Car(straße.getLaneCenter(2), carCANVAS.height/2, 50, 75, "AI", 4) );
+    }
+    return cars;
+}
+
+//#endregion Utility-Functions
 
 
 
 
 //#region Main
 
-const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=4);// 0.95 für Abstand am Straßenrand
-const auto = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4);
+const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=5);// 0.95 für Abstand am Straßenrand
+//const auto = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
+
+const aiCars = generateCars(100);
+
 // Gegner Array
 const verkehr = [
     new Car(straße.getLaneCenter(2), carCANVAS.height/3, 50, 75, "DUMMY"),
@@ -538,38 +552,39 @@ function animate(time){
     nnCANVAS.height = window.innerHeight * 0.8;
 
     // Auto Daten je Frame aktualisieren
-    auto.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
+    //auto.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
+    aiCars.forEach(ai => ai.update(straße.borders, verkehr));
+
     // Verkehr updaten
-    verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
+    //verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
 
 
     // Nur das Zeichen der Straße und des Autos werden um x,y verschoben
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
-    carCTX.translate(0, - auto.y + carCANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
 
+    // verfolge das Auto das am weitesten ist (y am kleinsten)
+    let besteAI = aiCars[0]
+    aiCars.forEach(ai => {
+        if(ai.y < besteAI.y){
+            besteAI = ai;
+        }
+    });
+    carCTX.translate(0, - besteAI.y + carCANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
+
+    // Zeichnen
     straße.draw();
-    verkehr.forEach(gegner => {gegner.draw("rgb(69, 77, 63)")});
-    auto.draw("black");
+    //verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
+    //auto.draw("black");
+    aiCars.forEach(ai => ai.draw("black", false, 0.7) );
+    besteAI.draw("black", true, 1); // true ist für Sensor
 
     carCTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
     // NN zeichnen
     nnCTX.lineDashOffset = -time/50;
-    Visualizer.drawNetwork(nnCTX, auto.brain);
+    Visualizer.drawNetwork(nnCTX, besteAI.brain);
 
     requestAnimationFrame(animate);
 }
 
 //#endregion Main
-
-
-
-
-//#region EventListener
-
-// wenn man die Fenster-Größe verändert
-window.addEventListener("resize", () => {
-    carCANVAS.height = window.innerHeight;
-});
-
-//#endregion EventListener
