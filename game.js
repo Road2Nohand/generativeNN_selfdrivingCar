@@ -34,6 +34,11 @@ const carCTX = carCANVAS.getContext("2d");
 const nnCANVAS = document.getElementById("nnCanvas");
 nnCANVAS.width = window.innerWidth * 0.5;
 const nnCTX = nnCANVAS.getContext("2d");
+
+// BTNs
+const saveBTN = document.getElementById("saveBTN");
+let besteAI;
+
 //#endregionGlobals
 
 
@@ -563,7 +568,7 @@ function animate(time){
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
 
     // verfolge das Auto das am weitesten ist (y am kleinsten)
-    let besteAI = aiCars[0]
+    besteAI = aiCars[0]
     aiCars.forEach(ai => {
         if(ai.y < besteAI.y){
             besteAI = ai;
@@ -588,3 +593,14 @@ function animate(time){
 }
 
 //#endregion Main
+
+
+//#region EventListener
+
+// bestes Brain als JSON saven
+saveBTN.onclick = () => {
+    localStorage.setItem("besteAI", JSON.stringify(besteAI.brain));
+    alert("Brain gespeichert!");
+}
+
+//#endregion EventListener
