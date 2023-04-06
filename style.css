@@ -1,12 +1,12 @@
 * {
     font-family: Calibri;
     margin: 0;
-    text-align: center; /*Wennn Text vorhanden in einem Block, dann mittig*/
+    text-align: center;
 }
 
 body {
     background: gray;
-    overflow: hidden; /*Für Scrollbars*/
+    overflow: hidden;
 }
 
 h1 {
@@ -25,14 +25,19 @@ h1 {
     margin-bottom: 5%;
 }
 
-#saveBTN {
+button {
     font-size: 30px;
+    width: 70px;
     position: absolute;
     border-radius: 10px 10px;
     margin: 10px;
     left: 0;
 }
 
-#saveBTN:hover {
+button:hover {
     box-shadow: 2px 2px 20px white;
+}
+
+#killBTN {
+    margin-top: 60px;
 }
