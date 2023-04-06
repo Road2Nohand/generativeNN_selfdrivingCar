@@ -5,7 +5,7 @@
 }
 
 body {
-    background: black;
+    background: gray;
     overflow: hidden; /*Für Scrollbars*/
 }
 
@@ -14,7 +14,7 @@ body {
 }
 
 #nnCanvas {
-    background: darkgray;
+    background: gray;
     margin-left: 10%;
     margin-bottom: 5%;
 }
@@ -22,6 +22,8 @@ body {
 #saveBTN {
     font-size: 30px;
     position: absolute;
+    border-radius: 10px 10px;
+    margin: 10px;
     left: 0;
 }
 

@@ -527,7 +527,7 @@ function polysIntersect(poly1, poly2) {
 function generateCars(n){
     const cars = [];
     for(let i=1; i <= n; i++){
-        cars.push(new Car(straße.getLaneCenter(2), carCANVAS.height/2, 50, 75, "AI", 4) );
+        cars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4) );
     }
     return cars;
 }
@@ -539,7 +539,7 @@ function generateCars(n){
 
 //#region Main
 
-const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=5);// 0.95 für Abstand am Straßenrand
+const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
 //const auto = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
 
 const aiCars = generateCars(100);
