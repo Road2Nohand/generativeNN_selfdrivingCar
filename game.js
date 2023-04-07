@@ -152,23 +152,24 @@ class Car {
             this.#move();
             this.polygon = this.#createPolygon();
             this.damaged = this.#damageDetection(roadBorders, verkehr);
-        }
-        if(this.sensor){
-            this.sensor.update(roadBorders, verkehr); //damit Sensoren Collision berechnen können
-            
-            // Abstände als Inputs Brain geben, ansonsten 0
-            // 1 - Abstand, weil die Inputs sollen kleine Werte für weit Entferntes bekommen und Hohe für Nahes
-            const offsets = this.sensor.readings.map(ray => ray == null ? 0 : 1-ray.offset); // ray.offset ist bereits im Bereich [0,1]
-            
-            // Outputs vom Brain kriegen
-            const outputs = NeuralNetwork.feedForward(offsets, this.brain);
-            
-            // Brain Controller geben
-            if(this.useBrain){
-                this.controller.forward = outputs[0]; // funktioniert weil outputs immer "0" oder "1" sind -> Binärere Klassifizierer
-                this.controller.left = outputs[1];
-                this.controller.right = outputs[2];
-                this.controller.reverse = outputs[3];
+
+            if(this.sensor){
+                this.sensor.update(roadBorders, verkehr); //damit Sensoren Collision berechnen können
+                
+                // Abstände als Inputs Brain geben, ansonsten 0
+                // 1 - Abstand, weil die Inputs sollen kleine Werte für weit Entferntes bekommen und Hohe für Nahes
+                const offsets = this.sensor.readings.map(ray => ray == null ? 0 : 1-ray.offset); // ray.offset ist bereits im Bereich [0,1]
+                
+                // Outputs vom Brain kriegen
+                const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+                
+                // Brain Controller geben
+                if(this.useBrain){
+                    this.controller.forward = outputs[0]; // funktioniert weil outputs immer "0" oder "1" sind -> Binärere Klassifizierer
+                    this.controller.left = outputs[1];
+                    this.controller.right = outputs[2];
+                    this.controller.reverse = outputs[3];
+                }
             }
         }
     }

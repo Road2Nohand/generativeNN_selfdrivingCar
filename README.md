@@ -1,8 +1,26 @@
-# NEAT : Neural Evolution of Augmenting Topologies
+# NEAT : Evolving Neural Networks through Augmenting Topologies
 
 Dieses Projekt ist stark inspiriert von Dr. Radu Mariescu-Istodo und erweitert um die Algorithmen des offiziellen NEAT Papers: https://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
 
-**Definition:** Der NEAT-Algorithmus (NeuroEvolution of Augmenting Topologies) ist ein genetischer Algorithmus zur Evolution künstlicher neuronaler Netze (ANNs). Er wurde von Kenneth O. Stanley und Risto Miikkulainen entwickelt und erstmals im Jahr 2002 im wissenschaftlichen Artikel "Evolving Neural Networks through Augmenting Topologies" vorgestellt.
+**Definition:** Der NEAT-Algorithmus ist ein genetischer Algorithmus zur Evolution künstlicher neuronaler Netze (ANNs). Er wurde von Kenneth O. Stanley und Risto Miikkulainen entwickelt und erstmals im Jahr 2002 im wissenschaftlichen Artikel "Evolving Neural Networks through Augmenting Topologies" vorgestellt.
+
+## Funktionsweise
+
+1. **Kodierung**
+   Jedes neuronale Netz wird als Genom dargestellt, das aus einer Liste von Genen besteht. Jedes Gen enthält Informationen über Neuronen (Knoten) und Verbindungen (Kanten) zwischen diesen Neuronen.
+2. **Innovation**
+   Um das Problem der konkurrierenden Konvergenz zu vermeiden, verwendet NEAT das Konzept der Innovation. Jede neue Verbindung oder jedes neue Neuron erhält eine eindeutige Innovationsnummer. Diese Nummer hilft, unterschiedliche Mutationen im Laufe der Evolution konsistent zu halten. 
+   Konkurrierende Konvergenz ist ein Phänomen, das in evolutionären Algorithmen auftritt, wenn verschiedene Lösungen oder Individuen in der Population gleichzeitig ähnliche Eigenschaften entwickeln. Dies kann dazu führen, dass die genetische Vielfalt in der Population abnimmt, wodurch der Suchraum eingeschränkt wird und die Evolution der Lösungen nicht optimal verläuft.
+3. **Spezien**
+   Die Population von neuronalen Netzen wird in Spezies unterteilt, die ähnliche Topologien aufweisen. Dadurch wird verhindert, dass neuartige Topologien zu früh aussterben, indem sie ihnen Zeit gibt, sich anzupassen.
+4. **Selektion**
+   Innerhalb jeder Spezies werden die Netze nach ihrer Fitness (d.h. ihrer Leistung in der gegebenen Aufgabe) bewertet. Die am besten bewerteten Netze jeder Spezies werden zur Fortpflanzung ausgewählt.
+5. **Crossover**
+   Bei der Fortpflanzung werden Gene von zwei Elternnetzen ausgewählt und kombiniert, um ein neues Kindnetz zu erstellen. Gene mit der gleichen Innovationsnummer (übereinstimmende Gene) werden zufällig ausgewählt, während nicht übereinstimmende Gene (disjunkt und überschüssig) vom fitteren Elternteil übernommen werden.
+6. **Mutation**
+   Nach dem Crossover kann das Kindnetz mutieren, wobei Änderungen an der Topologie und den Gewichten vorgenommen werden. Es gibt verschiedene Arten von Mutationen, wie das Hinzufügen oder Löschen von Verbindungen, das Hinzufügen oder Löschen von Neuronen oder das Ändern der Verbindungsgewichte.
+7. **Generationswechsel**
+   Nachdem genügend Nachkommen erstellt wurden, ersetzen sie die alte Population. Der Algorithmus wiederholt dann die Schritte 3-7, bis eine bestimmte Anzahl von Generationen erreicht ist oder die gewünschte Fitness erreicht wurde.
 
 ## Unterschied zu anderen NeuroEvo-Alg.
 

@@ -74,6 +74,9 @@ class DenseLayer {
     }
 }
 
+
+
+
 function getRGBA(value){
     const alpha=Math.abs(value);
     const R=value<0?0:255;
