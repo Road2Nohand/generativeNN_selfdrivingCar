@@ -1,6 +1,6 @@
 # NEAT : Neural Evolution of Augmenting Topologies
 
-Dieses Projekt ist stark inspiriert von Dr. Radu Mariescu-Istodo und dem offiziellen NEAT Paper: https://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
+Dieses Projekt ist stark inspiriert von Dr. Radu Mariescu-Istodo und erweitert um die Algorithmen des offiziellen NEAT Papers: https://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
 
 **Definition:** Der NEAT-Algorithmus (NeuroEvolution of Augmenting Topologies) ist ein genetischer Algorithmus zur Evolution künstlicher neuronaler Netze (ANNs). Er wurde von Kenneth O. Stanley und Risto Miikkulainen entwickelt und erstmals im Jahr 2002 im wissenschaftlichen Artikel "Evolving Neural Networks through Augmenting Topologies" vorgestellt.
 
@@ -13,7 +13,7 @@ Die Hauptbeiträge des Papers sind:
 1. Eine Methode, um die Evolution von Netzwerkstrukturen zu ermöglichen, indem neue Knoten und Verbindungen schrittweise eingeführt werden.
 2. Die Einführung eines historischen Markierungssystems (Gene History), das es ermöglicht, unterschiedliche Netzwerkstrukturen effektiv zu kreuzen, indem es Genomähnlichkeiten aufgrund ihrer historischen Herkunft erkennt.
 3. Die Verwendung von Spezies, um die Vielfalt der Population aufrechtzuerhalten und das Problem der konkurrierenden Zusammenführung von Spezies zu lösen.
-In ihren Experimenten verglichen die Autoren NEAT mit anderen Neuroevolutionsansätzen, darunter fixe Topologien (FT), zufällige Topologien (RT) und die Evolution von Verbindungsgewichten und Topologien getrennt (WCCI). Die Ergebnisse zeigten, dass NEAT bessere Leistungen und eine schnellere Konvergenz erzielte als die anderen Ansätze.
+   In ihren Experimenten verglichen die Autoren NEAT mit anderen Neuroevolutionsansätzen, darunter fixe Topologien (FT), zufällige Topologien (RT) und die Evolution von Verbindungsgewichten und Topologien getrennt (WCCI). Die Ergebnisse zeigten, dass NEAT bessere Leistungen und eine schnellere Konvergenz erzielte als die anderen Ansätze.
 
 Das Paper zeigt auch, dass NEAT erfolgreich komplexe Steuerungsaufgaben lösen kann, wie zum Beispiel das doppelt aufgehängte Pendel (Double Pole Balancing) und das doppelt aufgehängte Pendel mit Markov-Entscheidungsprozessen (Double Pole Balancing with Markov Decision Processes).
 
