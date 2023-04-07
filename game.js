@@ -56,8 +56,7 @@ const controllerBTN = document.getElementById("controllerBTN");
 let STEUERN = false;
 let controlledAI;
 
-
-
+const restartBTN = document.getElementById("restartBTN");
 
 //#endregionGlobals
 
@@ -585,6 +584,7 @@ function animate(time){
         nnCANVAS.height = window.innerHeight * 0.7;
     }
 
+    // UPDATEN
     // Auto Daten je Frame aktualisieren
     controlledAI.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     aiCars.forEach(ai => ai.update(straße.borders, verkehr));
@@ -593,9 +593,7 @@ function animate(time){
     //verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
 
 
-    
-
-    // verfolge das Auto das am weitesten ist (y am kleinsten)
+    // beste tracken
     besteAI = aiCars[0]
     aiCars.forEach(ai => {
         if(ai.y < besteAI.y){
@@ -603,10 +601,9 @@ function animate(time){
         }
     });
 
+
     // Kamera Perspektive
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
-
-
     if (STEUERN) {
         carCTX.translate(0, -controlledAI.y + carCANVAS.height * 0.6);
     }
@@ -617,9 +614,8 @@ function animate(time){
         carCTX.translate(0, carCANVAS.height / 2); //Am Spawn stehen bleiben
     } 
     
-    
 
-    // Zeichnen
+    // DRAWN
     straße.draw();
     //verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
     aiCars.forEach(ai => ai.draw("black", false, 0.7) );
@@ -631,7 +627,11 @@ function animate(time){
     
     // NN zeichnen
     nnCTX.lineDashOffset = -time/50;
-    Visualizer.drawNetwork(nnCTX, besteAI.brain);
+    if(STEUERN){
+        Visualizer.drawNetwork(nnCTX, controlledAI.brain);
+    }else{
+        Visualizer.drawNetwork(nnCTX, besteAI.brain);
+    }
 
     requestAnimationFrame(animate);
 }
@@ -640,7 +640,13 @@ function animate(time){
 
 
 
+
 //#region EventListener
+
+// Seite Neuladen
+restartBTN.onclick = () => {
+    location.reload();
+}
 
 // bestes Brain als JSON saven
 saveBTN.onclick = () => {
