@@ -62,7 +62,7 @@ const loadBTN = document.getElementById("loadBTN");
 
 // Counter
 const populationCounter = document.getElementById("populationCounter");
-POPULATION = 100;
+POPULATION = 1000;
 
 //#endregionGlobals
 
@@ -603,8 +603,21 @@ const aiCars = generateCars(POPULATION);
 
 // Gegner Array
 const verkehr = [
-    new Car(straße.getLaneCenter(2), carCANVAS.height/3, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(3), carCANVAS.height/2, 50, 200, "DUMMY")
+
+    // 1. Welle
+    new Car(straße.getLaneCenter(0), carCANVAS.height-600, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(2), carCANVAS.height-600, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(1), carCANVAS.height-900, 50, 200, "DUMMY"),
+
+    // 2. Welle
+    new Car(straße.getLaneCenter(0), carCANVAS.height-1400, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(2), carCANVAS.height-1400, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(1), carCANVAS.height-2000, 50, 200, "DUMMY"),
+
+    // 3. Welle
+    new Car(straße.getLaneCenter(0), carCANVAS.height-2400, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(2), carCANVAS.height-2400, 50, 75, "DUMMY"),
+    new Car(straße.getLaneCenter(1), carCANVAS.height-3000, 50, 200, "DUMMY")
 ];
 
 // Gameloop
@@ -627,15 +640,15 @@ function animate(time){
     controlledAI.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     aiCars.forEach(ai => ai.update(straße.borders, verkehr));
 
+    // Verkehr updaten
+    verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
+
+
     // Populations Counter
     anzCarsTot = (aiCars.filter(car => car.damaged)).length;
     populationCounter.innerText = "Population: " + (POPULATION - anzCarsTot);
 
-    // Verkehr updaten
-    //verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
-
-
-    // beste tracken
+    // FITNESS FUNCTION
     besteAI = aiCars[0]
     aiCars.forEach(ai => {
         if(ai.y < besteAI.y){
@@ -659,7 +672,7 @@ function animate(time){
 
     // DRAWN
     straße.draw();
-    //verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
+    verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
     aiCars.forEach(ai => ai.draw("black", false, 0.7) );
     besteAI.draw("black", true, 1); // true ist für Sensor
     if(STEUERN){
@@ -693,7 +706,19 @@ restartBTN.onclick = () => {
 // bestes Brain als JSON saven
 saveBTN.onclick = () => {
     safeBrain(besteAI.brain);
-    alert("Brain gespeichert!");
+    brainJSON = JSON.stringify(besteAI.brain);
+
+    // Anz Layers herausfinden
+    numberNeurons = 0;
+    numberWeights = 0;
+    for(let i=0; i < besteAI.brain.denseLayers.length; i++){
+        numberNeurons += besteAI.brain.denseLayers[i].weights.length;
+    }
+
+    alert("Brain gespeichert! \n\n" 
+        + "Layers: " + besteAI.brain.denseLayers.length +"\n"
+        + "Neurons: " + numberNeurons
+    );
 }
 
 // Brain to JSON
@@ -705,7 +730,6 @@ exportBTN.onclick =  () => {
 loadBTN.onclick =  () => {
     besteAI.brain = loadBrain();
 }
-
 
 // besten Kandidaten killen
 killBTN.onclick = () => {
@@ -743,6 +767,5 @@ controllerBTN.onclick = () => {
     controlledAI.x = besteAI.x;
     controlledAI.y = besteAI.y;
 }
-
 
 //#endregion EventListener
