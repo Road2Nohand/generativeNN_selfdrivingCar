@@ -566,6 +566,23 @@ function isAppleDevice() {
     return /iPhone|iPad|iPod/.test(userAgent);
   }
 
+function exportBrain(){
+    const jsonString = localStorage.getItem('besteAI');
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'brain.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function loadBrain(){
+    
+}
+
 //#endregion Utility-Functions
 
 
@@ -605,7 +622,6 @@ function animate(time){
 
     // Populations Counter
     anzCarsTot = (aiCars.filter(car => car.damaged)).length;
-    console.log(anzCarsTot);
     populationCounter.innerText = "Population: " + (POPULATION - anzCarsTot);
 
     // Verkehr updaten
