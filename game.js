@@ -286,7 +286,12 @@ class Car {
         carCTX.fill();
 
         if(this.controlType != "DUMMY"){
-            carCTX.font = '24px Calibri';
+            if (isAppleDevice()) {
+                carCTX.font = '24px monospace';
+              } else {
+                carCTX.font = '24px Calibri';
+              }
+            
             carCTX.fillStyle = 'gray';
             const ySpeedText = this.ySpeed.toFixed(2);
             const textWidth = carCTX.measureText(ySpeedText).width;
@@ -551,6 +556,11 @@ function generateCars(n){
     }
     return cars;
 }
+
+function isAppleDevice() {
+    const userAgent = navigator.userAgent;
+    return /iPhone|iPad|iPod/.test(userAgent);
+  }
 
 //#endregion Utility-Functions
 
