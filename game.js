@@ -48,6 +48,8 @@ if (window.innerWidth <= 1000){
 const saveBTN = document.getElementById("saveBTN");
 let besteAI;
 
+const killBTN = document.getElementById("killBTN");
+
 //#endregionGlobals
 
 
@@ -622,6 +624,11 @@ function animate(time){
 saveBTN.onclick = () => {
     localStorage.setItem("besteAI", JSON.stringify(besteAI.brain));
     alert("Brain gespeichert!");
+}
+
+// besten Kandidaten killen
+killBTN.onclick = () => {
+    besteAI.damaged = true;
 }
 
 
