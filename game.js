@@ -58,6 +58,7 @@ let controlledAI;
 
 const restartBTN = document.getElementById("restartBTN");
 const exportBTN = document.getElementById("exportBTN");
+const loadBTN = document.getElementById("loadBTN");
 
 // Counter
 const populationCounter = document.getElementById("populationCounter");
@@ -581,11 +582,11 @@ function exportBrain(){
 }
 
 function safeBrain(brain){
-    localStorage.setItem("besteAI", JSON.stringify(brain));
+    localStorage.setItem("besteAI", JSON.stringify(brain)); // Gegenteil wäre JSON.parse()
 }
 
 function loadBrain(){
-    let test = "test";
+    return JSON.parse(localStorage.getItem("besteAI"));
 }
 
 //#endregion Utility-Functions
@@ -619,6 +620,7 @@ function animate(time){
         carCANVAS.height = window.innerHeight;
         nnCANVAS.height = window.innerHeight * 0.7;
     }
+
 
     // UPDATEN
     // Auto Daten je Frame aktualisieren
@@ -697,6 +699,11 @@ saveBTN.onclick = () => {
 // Brain to JSON
 exportBTN.onclick =  () => {
     exportBrain();
+}
+
+// Gebe der besten AI das gesavete Brain
+loadBTN.onclick =  () => {
+    besteAI.brain = loadBrain();
 }
 
 
