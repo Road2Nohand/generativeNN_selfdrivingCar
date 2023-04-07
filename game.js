@@ -561,7 +561,7 @@ function generateCars(n){
 //#region Main
 
 const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
-//const auto = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
+controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
 
 const aiCars = generateCars(100);
 
@@ -586,7 +586,7 @@ function animate(time){
     }
 
     // Auto Daten je Frame aktualisieren
-    //auto.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
+    controlledAI.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     aiCars.forEach(ai => ai.update(straße.borders, verkehr));
 
     // Verkehr updaten
@@ -605,24 +605,28 @@ function animate(time){
 
     // Kamera Perspektive
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
-    if(viewSPAWN){
-        carCTX.translate(0, carCANVAS.height / 2); //Am Spawn stehen bleiben
+
+
+    if (STEUERN) {
+        carCTX.translate(0, -controlledAI.y + carCANVAS.height * 0.6);
     }
-    if(!viewSPAWN){
+    else if (!viewSPAWN){
         carCTX.translate(0, - besteAI.y + carCANVAS.height * 0.6); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
     }
-    if(STEUERN){
-        carCTX.translate(0, - controlledAI.y + carCANVAS.height * 0.6);
-    }
+    else if (viewSPAWN) {
+        carCTX.translate(0, carCANVAS.height / 2); //Am Spawn stehen bleiben
+    } 
+    
     
 
     // Zeichnen
     straße.draw();
     //verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
-    //auto.draw("black");
     aiCars.forEach(ai => ai.draw("black", false, 0.7) );
     besteAI.draw("black", true, 1); // true ist für Sensor
-
+    if(STEUERN){
+        controlledAI.draw("black", true, 1);
+    }
     carCTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
     // NN zeichnen
@@ -654,17 +658,31 @@ spawnViewBTN.onclick = () => {
     // für toggle zwischen Spawn und bester AI
     if(viewSPAWN){
         viewSPAWN = false;
+        spawnViewBTN.style.background = "white";
     }else{
         viewSPAWN = true;
+        spawnViewBTN.style.background = "lawngreen";
     }
 }
 
 // selber Steuerung übernehmen
 controllerBTN.onclick = () => {
-    STEUERN = true;
-    controlledAI = besteAI;
-    controlledAI.controlType = "KEYS";
+    if(STEUERN){
+        STEUERN = false;
+        controllerBTN.style.background = "white";
+        // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
+        spawnViewBTN.style.background = "white";
+        spawnViewBTN.disabled = false;
+    }else{
+        STEUERN = true;
+        controllerBTN.style.background = "lawngreen";
+        // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
+        spawnViewBTN.style.background = "gray";
+        spawnViewBTN.disabled = true;
+    }
     controlledAI.ySpeed = 0;
+    controlledAI.x = besteAI.x;
+    controlledAI.y = besteAI.y;
 }
 
 
