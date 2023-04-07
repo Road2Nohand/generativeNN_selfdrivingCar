@@ -2,6 +2,7 @@
     font-family: Calibri, -apple-system, BlinkMacSystemFont;
     margin: 0;
     text-align: center;
+    color: black; /*für apple fonts hier, ansonsten sind die blau*/
 }
 
 body {
@@ -29,6 +30,11 @@ body {
     display: flex;
     flex-direction: column;
     padding: 30px;
+}
+
+#populationCounter{
+    color: white;
+    font-size: 22px;
 }
 
 button {

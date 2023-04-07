@@ -58,6 +58,10 @@ let controlledAI;
 
 const restartBTN = document.getElementById("restartBTN");
 
+// Counter
+const populationCounter = document.getElementById("populationCounter");
+POPULATION = 100;
+
 //#endregionGlobals
 
 
@@ -567,12 +571,12 @@ function isAppleDevice() {
 
 
 
+
 //#region Main
 
 const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
 controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
-
-const aiCars = generateCars(100);
+const aiCars = generateCars(POPULATION);
 
 // Gegner Array
 const verkehr = [
@@ -598,6 +602,11 @@ function animate(time){
     // Auto Daten je Frame aktualisieren
     controlledAI.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     aiCars.forEach(ai => ai.update(straße.borders, verkehr));
+
+    // Populations Counter
+    anzCarsTot = (aiCars.filter(car => car.damaged)).length;
+    console.log(anzCarsTot);
+    populationCounter.innerText = "Population: " + (POPULATION - anzCarsTot);
 
     // Verkehr updaten
     //verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
@@ -645,8 +654,8 @@ function animate(time){
 
     requestAnimationFrame(animate);
 }
-
 //#endregion Main
+
 
 
 
