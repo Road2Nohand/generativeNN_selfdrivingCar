@@ -62,7 +62,7 @@ const loadBTN = document.getElementById("loadBTN");
 
 // Counter
 const populationCounter = document.getElementById("populationCounter");
-POPULATION = 1000;
+POPULATION = 100;
 
 //#endregionGlobals
 
