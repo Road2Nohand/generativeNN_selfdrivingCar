@@ -511,7 +511,9 @@ class Sensor{
 
 // Lineare Interpolierungs Hilfs-Funktion
 function lerp(A,B,t){
-    return A+(B-A)*t;
+    // lerp ist quasi die funktion der gerade, kann aber auch auf alle Skalare innerhalb von nDimensinalen-Vektoren angewandt werden
+    // wegen der Trendkomponente gut für Forecasting
+    return A+(B-A)*t; // "t" ist der Interpolierungs-Faktor und gibt an in welche Richtung der neue Wert liegen soll, t=0 -> A, bei t=1 -> B
 }
 
 // Berechnet den Schnittpunkt zweier Geraden mittels Vektoren, wobei die erste Gerade aus den Punkten A, B besteht usw.
@@ -536,7 +538,7 @@ function getIntersection(A,B,C,D){
 }
 
 // Collision Detection Util Funktion für Polygone
-function polysIntersect(poly1, poly2) {
+function polysIntersect(poly1, poly2){
     for(let i=0; i < poly1.length; i++){
         for(let j=0; j < poly2.length; j++){
             //workaround mit Modulo um index out of bounds zu vermeiden
@@ -563,7 +565,7 @@ function generateCars(n){
     return cars;
 }
 
-function isAppleDevice() {
+function isAppleDevice(){
     const userAgent = navigator.userAgent;
     return /iPhone|iPad|iPod/.test(userAgent);
 }
@@ -673,10 +675,10 @@ function animate(time){
     // DRAWN
     straße.draw();
     verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
+    besteAI.draw("blue", true, 1); // true ist für Sensor
     aiCars.forEach(ai => ai.draw("black", false, 0.7) );
-    besteAI.draw("black", true, 1); // true ist für Sensor
     if(STEUERN){
-        controlledAI.draw("black", true, 1);
+        controlledAI.draw("lawngreen", true, 1);
     }
     carCTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
@@ -765,7 +767,7 @@ controllerBTN.onclick = () => {
     }
     controlledAI.ySpeed = 0;
     controlledAI.x = besteAI.x;
-    controlledAI.y = besteAI.y;
+    controlledAI.y = carCANVAS.height / 2;
 }
 
 //#endregion EventListener
