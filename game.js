@@ -57,6 +57,7 @@ let STEUERN = false;
 let controlledAI;
 
 const restartBTN = document.getElementById("restartBTN");
+const exportBTN = document.getElementById("exportBTN");
 
 // Counter
 const populationCounter = document.getElementById("populationCounter");
@@ -564,7 +565,7 @@ function generateCars(n){
 function isAppleDevice() {
     const userAgent = navigator.userAgent;
     return /iPhone|iPad|iPod/.test(userAgent);
-  }
+}
 
 function exportBrain(){
     const jsonString = localStorage.getItem('besteAI');
@@ -579,8 +580,12 @@ function exportBrain(){
     URL.revokeObjectURL(url);
 }
 
+function safeBrain(brain){
+    localStorage.setItem("besteAI", JSON.stringify(brain));
+}
+
 function loadBrain(){
-    
+    let test = "test";
 }
 
 //#endregion Utility-Functions
@@ -685,9 +690,15 @@ restartBTN.onclick = () => {
 
 // bestes Brain als JSON saven
 saveBTN.onclick = () => {
-    localStorage.setItem("besteAI", JSON.stringify(besteAI.brain));
+    safeBrain(besteAI.brain);
     alert("Brain gespeichert!");
 }
+
+// Brain to JSON
+exportBTN.onclick =  () => {
+    exportBrain();
+}
+
 
 // besten Kandidaten killen
 killBTN.onclick = () => {
