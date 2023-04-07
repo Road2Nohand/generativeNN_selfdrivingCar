@@ -47,8 +47,17 @@ if (window.innerWidth <= 1000){
 // BTNs
 const saveBTN = document.getElementById("saveBTN");
 let besteAI;
-
 const killBTN = document.getElementById("killBTN");
+// Kamera
+const spawnViewBTN = document.getElementById("spawnViewBTN");
+let viewSPAWN = false;
+// selber Steuern
+const controllerBTN = document.getElementById("controllerBTN");
+let STEUERN = false;
+let controlledAI;
+
+
+
 
 //#endregionGlobals
 
@@ -596,8 +605,16 @@ function animate(time){
 
     // Kamera Perspektive
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
-    carCTX.translate(0, - besteAI.y + carCANVAS.height * 0.6); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
-    //carCTX.translate(0, 0); Am Spawn stehen bleiben
+    if(viewSPAWN){
+        carCTX.translate(0, carCANVAS.height / 2); //Am Spawn stehen bleiben
+    }
+    if(!viewSPAWN){
+        carCTX.translate(0, - besteAI.y + carCANVAS.height * 0.6); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
+    }
+    if(STEUERN){
+        carCTX.translate(0, - controlledAI.y + carCANVAS.height * 0.6);
+    }
+    
 
     // Zeichnen
     straße.draw();
@@ -630,6 +647,24 @@ saveBTN.onclick = () => {
 // besten Kandidaten killen
 killBTN.onclick = () => {
     besteAI.damaged = true;
+}
+
+// spawn view Button
+spawnViewBTN.onclick = () => {
+    // für toggle zwischen Spawn und bester AI
+    if(viewSPAWN){
+        viewSPAWN = false;
+    }else{
+        viewSPAWN = true;
+    }
+}
+
+// selber Steuerung übernehmen
+controllerBTN.onclick = () => {
+    STEUERN = true;
+    controlledAI = besteAI;
+    controlledAI.controlType = "KEYS";
+    controlledAI.ySpeed = 0;
 }
 
 
