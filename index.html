@@ -8,14 +8,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Neural Evolution of Augmenting Topologies</h1>
+        
 
-    <canvas id="carCanvas"></canvas>
+    <div id="carDiv">
+        <div id="btnDiv">
+            <button id="saveBTN">Save</button>
+            <button id="killBTN">Kill</button>
+        </div>
+
+        <canvas id="carCanvas"></canvas>
+    </div>
     
-        <button id="saveBTN">Save</button>
-        <button id="killBTN">Kill</button>
+
+    <div id="nnDiv">
+        <h1>Neural Evolution of Augmenting Topologies</h1>
+        <canvas id="nnCanvas"></canvas>
+    </div>
     
-    <canvas id="nnCanvas"></canvas>
 
     <script src="neuralNetwork.js"></script>
     <script src="game.js"></script>

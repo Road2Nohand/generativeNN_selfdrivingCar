@@ -1,43 +1,81 @@
 * {
     font-family: Calibri;
     margin: 0;
-    text-align: center;
 }
 
 body {
     background: gray;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
     overflow: hidden;
 }
 
-h1 {
-    position: fixed;
-    margin-top: 10px;
-    margin-left: 45%;
-}
 
 #carCanvas {
     background: lightgray;
+    border: 2px solid yellow;
 }
 
-#nnCanvas {
-    background: gray;
-    margin-left: 10%;
-    margin-bottom: 5%;
+
+#carDiv {
+    display: flex;
+}
+
+#btnDiv {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
 }
 
 button {
     font-size: 30px;
-    width: 70px;
-    position: absolute;
-    border-radius: 10px 10px;
     margin: 10px;
-    left: 0;
+    width: 70px;
+    border-radius: 10px 10px;
 }
 
 button:hover {
     box-shadow: 2px 2px 20px white;
 }
 
-#killBTN {
-    margin-top: 60px;
+
+#nnDiv {
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
 }
+
+h1 {
+    text-align: center;
+    font-size: 300%;
+}
+
+#nnCanvas {
+    background: gray;
+}
+
+
+
+/*Falls ein Handy*/
+@media screen and (max-width: 1000px) {
+    body {
+      display: flex;
+      flex-direction: column;
+      overflow:auto;
+    }
+
+    h1 {
+        margin-top: 40px;
+        font-size: 200%;
+    }
+
+    #nnDiv {
+        width: 100vw;
+    }
+
+    #btnDiv {
+        padding: 5px
+    }
+  }

@@ -26,14 +26,23 @@
 
 // car Canvas
 const carCANVAS = document.getElementById("carCanvas");
-carCANVAS.height = window.innerHeight;
-carCANVAS.width = 400;
 const carCTX = carCANVAS.getContext("2d");
 
 // nn Canvas
 const nnCANVAS = document.getElementById("nnCanvas");
-nnCANVAS.width = window.innerWidth * 0.5;
 const nnCTX = nnCANVAS.getContext("2d");
+
+// canvas BREITEN initial einmal setzen wenn Handy oder Desktop
+if (window.innerWidth <= 1000){
+    carCANVAS.width = window.innerWidth * 0.7;
+    nnCANVAS.width = window.innerWidth; // in style.css hier 100vw
+    
+}else{
+    carCANVAS.width = 400;
+    nnCANVAS.width = window.innerWidth * 0.5; // muss 50% sein, weil wir 50vw in style.css genommen haben
+}
+// HÖHEN werde in animate() gesetzt
+
 
 // BTNs
 const saveBTN = document.getElementById("saveBTN");
@@ -553,8 +562,16 @@ const verkehr = [
 // Gameloop
 animate();
 function animate(time){
-    carCANVAS.height = window.innerHeight; // anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
-    nnCANVAS.height = window.innerHeight * 0.8;
+
+    // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
+    if (window.innerWidth <= 1000){
+        carCANVAS.height = window.innerHeight;
+        nnCANVAS.height = window.innerHeight * 0.7;
+    }
+    else{
+        carCANVAS.height = window.innerHeight;
+        nnCANVAS.height = window.innerHeight * 0.7;
+    }
 
     // Auto Daten je Frame aktualisieren
     //auto.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
@@ -564,8 +581,7 @@ function animate(time){
     //verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
 
 
-    // Nur das Zeichen der Straße und des Autos werden um x,y verschoben
-    carCTX.save(); // speichern des Canvas-Stacks bis jetzt
+    
 
     // verfolge das Auto das am weitesten ist (y am kleinsten)
     besteAI = aiCars[0]
@@ -574,7 +590,11 @@ function animate(time){
             besteAI = ai;
         }
     });
-    carCTX.translate(0, - besteAI.y + carCANVAS.height * 0.7); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
+
+    // Kamera Perspektive
+    carCTX.save(); // speichern des Canvas-Stacks bis jetzt
+    carCTX.translate(0, - besteAI.y + carCANVAS.height * 0.6); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
+    //carCTX.translate(0, 0); Am Spawn stehen bleiben
 
     // Zeichnen
     straße.draw();
@@ -595,6 +615,7 @@ function animate(time){
 //#endregion Main
 
 
+
 //#region EventListener
 
 // bestes Brain als JSON saven
@@ -602,5 +623,6 @@ saveBTN.onclick = () => {
     localStorage.setItem("besteAI", JSON.stringify(besteAI.brain));
     alert("Brain gespeichert!");
 }
+
 
 //#endregion EventListener
