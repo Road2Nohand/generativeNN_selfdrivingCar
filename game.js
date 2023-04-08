@@ -667,10 +667,21 @@ function initObjects(){
 
 initObjects();
 
+// Vergangene Zeit messen
+let startTime = performance.now(); // Performance.now() liefert die vergangene Zeit seitdem die Seite geladen wurde in ms
+let time;
+
+
+
 // Gameloop
 animate();
 function animate(time){
     requestAnimationFrame(animate);
+    
+    if(time - startTime >= 10000){
+        console.log("10 Sekunde vergangen")
+        startTime = performance.now();
+    }
 
     // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
     if (window.innerWidth <= 1000){
