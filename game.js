@@ -669,7 +669,7 @@ initObjects();
 
 // Vergangene Zeit messen
 let startTime = performance.now(); // Performance.now() liefert die vergangene Zeit seitdem die Seite geladen wurde in ms
-let time;
+let vergangeneZeit = 0;
 
 
 
@@ -679,7 +679,8 @@ function animate(time){
     requestAnimationFrame(animate);
     
     if(time - startTime >= 10000){
-        console.log("10 Sekunde vergangen")
+        vergangeneZeit += 10;
+        console.log(vergangeneZeit + " Sekunde vergangen");
         startTime = performance.now();
     }
 
