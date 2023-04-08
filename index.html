@@ -13,10 +13,14 @@
     <div id="carDiv">
         <div id="btnDiv">
             <div id="populationCounter">Population: 0</div>
-            <button id="restartBTN">🔄</button>
+            <div id="sliderDiv">
+                <input type="range" min="1" max="1000" value="1000" id="populationSlider">
+                <p id="populationSliderValue">1000</p>
+            </div>
+            <button id="restartBTN">Epoch🔄</button>
             <button id="saveBTN">Save🧠</button>
-            <div id="mutationSliderDiv">
-                <p class="desc"><b>Mutation</b></p>
+            <div id="sliderDiv">
+                <p><b>Load Mutation</b></p>
                 <input type="range" min="0" max="100" value="10" id="mutationSlider">
                 <p id="mutationSliderValue">10%</p>
             </div>

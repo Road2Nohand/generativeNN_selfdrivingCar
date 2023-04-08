@@ -59,8 +59,8 @@ const exportBTN = document.getElementById("exportBTN");
 const loadBTN = document.getElementById("loadBTN");
 
 // Slider
-let mutationSlider = document.getElementById("mutationSlider");
-let mutationSliderValue = document.getElementById("mutationSliderValue");
+const mutationSlider = document.getElementById("mutationSlider");
+const mutationSliderValue = document.getElementById("mutationSliderValue");
 // Slider auf den Wert des Local Storages setzen, sofern vorhanden
 let t_MUTATE = 0.1;
 if(localStorage.getItem("t_MUTATE")){
@@ -70,12 +70,18 @@ mutationSlider.value = t_MUTATE * 100;
 mutationSliderValue.innerHTML = mutationSlider.value + "%";
 
 
-
-
-
-// Counter
+// Population Counter
 const populationCounter = document.getElementById("populationCounter");
+const populationSlider = document.getElementById("populationSlider");
+const populationSliderValue = document.getElementById("populationSliderValue");
 POPULATION = 1000;
+if(localStorage.getItem("POPULATION")){
+    POPULATION = localStorage.getItem("POPULATION");
+}
+populationSlider.value = POPULATION;
+populationSliderValue.innerHTML = POPULATION;
+
+
 
 // Objects
 let controlledAI;
@@ -738,7 +744,10 @@ function animate(time){
 
 //#region EventListener
 
-
+populationSlider.oninput = () => {
+    populationSliderValue.innerHTML = populationSlider.value;
+    localStorage.setItem("POPULATION", populationSlider.value);
+}
 
 // Seite Neuladen
 restartBTN.onclick = () => {
