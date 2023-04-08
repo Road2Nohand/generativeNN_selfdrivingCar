@@ -74,7 +74,7 @@ mutationSliderValue.innerHTML = mutationSlider.value + "%";
 const populationCounter = document.getElementById("populationCounter");
 const populationSlider = document.getElementById("populationSlider");
 const populationSliderValue = document.getElementById("populationSliderValue");
-POPULATION = 1000;
+POPULATION = 100;
 if(localStorage.getItem("POPULATION")){
     POPULATION = localStorage.getItem("POPULATION");
 }
