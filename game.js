@@ -592,20 +592,20 @@ function loadBrain(){
 
 // mehrere nn Cars instanziieren
 function generateCars(n){
-    const cars = [];
+    aiCars = [];
     for(let i=1; i <= n; i++){
-        cars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4) );
+        aiCars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4) );
     }
-    return cars;
+    return aiCars;
 }
 
 function initObjects(){
     straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
     controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
-    aiCars = generateCars(POPULATION);
+    generateCars(POPULATION);
     besteAI = aiCars[0];
 
-    // Gegner Array
+    // Dummy Array
     verkehr = [
 
         // 1. Welle
@@ -653,6 +653,7 @@ initObjects();
 // Gameloop
 animate();
 function animate(time){
+    requestAnimationFrame(animate);
 
     // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
     if (window.innerWidth <= 1000){
@@ -684,7 +685,7 @@ function animate(time){
         if(ai.y < besteAI.y){
             besteAI = ai;
         }
-    });
+    });    
 
 
     // Kamera Perspektive
@@ -696,7 +697,7 @@ function animate(time){
         carCTX.translate(0, - besteAI.y + carCANVAS.height * 0.6); //alles wird um die Position des Autos verschoben, somit wird alles relativ zur aktuellen Position des Autos gezeichnet  
     }
     else if (viewSPAWN) {
-        carCTX.translate(0, carCANVAS.height / 2); //Am Spawn stehen bleiben
+        carCTX.translate(0, carCANVAS.height * 0.6); //Am Spawn stehen bleiben
     } 
     
 
@@ -708,7 +709,7 @@ function animate(time){
     if(STEUERN){
         controlledAI.draw("lawngreen", true, 1);
     }
-    carCTX.restore(); // //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
+    carCTX.restore(); //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
     // NN zeichnen
     nnCTX.lineDashOffset = -time/50;
@@ -717,8 +718,6 @@ function animate(time){
     }else{
         Visualizer.drawNetwork(nnCTX, besteAI.brain);
     }
-
-    requestAnimationFrame(animate);
 }
 //#endregion Main
 
@@ -732,8 +731,7 @@ function animate(time){
 
 // Seite Neuladen
 restartBTN.onclick = () => {
-    //initObjects();
-    location.reload();
+    location.reload(); // schlecheter Workaround anstatt von initObjects, weil sonst bugs mit den Translates oben
 }
 
 // bestes Brain als JSON saven
