@@ -14,7 +14,6 @@ body {
     overflow: hidden;
 }
 
-
 /* carDiv */
 
 #carDiv {
@@ -23,7 +22,6 @@ body {
 
 #carCanvas {
     background: lightgray;
-    border: 2px solid yellow;
 }
 
 #btnDiv {
@@ -46,6 +44,10 @@ button {
 
 button:hover {
     box-shadow: 2px 2px 20px white;
+}
+
+#mutationSliderDiv {
+    font-size: 22px;
 }
 
 /* carDiv */

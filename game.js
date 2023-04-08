@@ -54,10 +54,22 @@ let viewSPAWN = false;
 const controllerBTN = document.getElementById("controllerBTN");
 let STEUERN = false;
 
-
 const restartBTN = document.getElementById("restartBTN");
 const exportBTN = document.getElementById("exportBTN");
 const loadBTN = document.getElementById("loadBTN");
+
+// Slider
+let mutationSlider = document.getElementById("mutationSlider");
+let mutationSliderValue = document.getElementById("mutationSliderValue");
+// Slider auf den Wert des Local Storages setzen, sofern vorhanden
+let t_MUTATE = 0.1;
+if(localStorage.getItem("t_MUTATE")){
+    t_MUTATE = localStorage.getItem("t_MUTATE");
+}
+mutationSlider.value = t_MUTATE * 100;
+mutationSliderValue.innerHTML = mutationSlider.value + "%";
+
+
 
 
 
@@ -149,6 +161,9 @@ class Car {
         this.angle = 0;
         this.acceleration = 0.1;
         this.maxYspeed = maxYspeed;
+        if(controlType == "KEYS"){
+            this.maxYspeed = 8;
+        }
         this.friction = 0.03;
         this.controller = new Controller(controlType);
         this.controlType = controlType;
@@ -586,10 +601,6 @@ function safeBrain(brain){
     localStorage.setItem("besteAI", JSON.stringify(brain)); // Gegenteil wäre JSON.parse()
 }
 
-function loadBrain(){
-    return JSON.parse(localStorage.getItem("besteAI"));
-}
-
 // mehrere nn Cars instanziieren
 function generateCars(n){
     aiCars = [];
@@ -752,14 +763,29 @@ saveBTN.onclick = () => {
     );
 }
 
+mutationSlider.oninput = () => {
+    mutationSliderValue.innerHTML = mutationSlider.value + "%";
+    t_MUTATE = mutationSlider.value / 100;
+    localStorage.setItem("t_MUTATE", t_MUTATE);
+}
+
+// Load Brain
+loadBTN.onclick =  () => {
+
+    // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
+    for(let i=0; i < aiCars.length; i++){
+        aiCars[i].brain = JSON.parse(localStorage.getItem("besteAI"));
+
+        // alle AIs mutieren um 10% bis auf erste AI
+        if(i != 0){
+            NeuralNetwork.mutate(aiCars[i].brain, t_MUTATE);
+        }
+    }
+}
+
 // Brain to JSON
 exportBTN.onclick =  () => {
     exportBrain();
-}
-
-// Gebe der besten AI das gesavete Brain
-loadBTN.onclick =  () => {
-    besteAI.brain = loadBrain();
 }
 
 // besten Kandidaten killen
