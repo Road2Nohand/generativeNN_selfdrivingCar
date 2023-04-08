@@ -46,7 +46,6 @@ if (window.innerWidth <= 1000){
 
 // BTNs
 const saveBTN = document.getElementById("saveBTN");
-let besteAI;
 const killBTN = document.getElementById("killBTN");
 // Kamera
 const spawnViewBTN = document.getElementById("spawnViewBTN");
@@ -54,15 +53,24 @@ let viewSPAWN = false;
 // selber Steuern
 const controllerBTN = document.getElementById("controllerBTN");
 let STEUERN = false;
-let controlledAI;
+
 
 const restartBTN = document.getElementById("restartBTN");
 const exportBTN = document.getElementById("exportBTN");
 const loadBTN = document.getElementById("loadBTN");
 
+
+
 // Counter
 const populationCounter = document.getElementById("populationCounter");
-POPULATION = 100;
+POPULATION = 1000;
+
+// Objects
+let controlledAI;
+let besteAI;
+let straße;
+let verkehr = [];
+let aiCars = [];
 
 //#endregionGlobals
 
@@ -556,15 +564,6 @@ function polysIntersect(poly1, poly2){
     return false;
 }
 
-// mehrere nn Cars instanziieren
-function generateCars(n){
-    const cars = [];
-    for(let i=1; i <= n; i++){
-        cars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4) );
-    }
-    return cars;
-}
-
 function isAppleDevice(){
     const userAgent = navigator.userAgent;
     return /iPhone|iPad|iPod/.test(userAgent);
@@ -591,6 +590,56 @@ function loadBrain(){
     return JSON.parse(localStorage.getItem("besteAI"));
 }
 
+// mehrere nn Cars instanziieren
+function generateCars(n){
+    const cars = [];
+    for(let i=1; i <= n; i++){
+        cars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4) );
+    }
+    return cars;
+}
+
+function initObjects(){
+    straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
+    controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
+    aiCars = generateCars(POPULATION);
+    besteAI = aiCars[0];
+
+    // Gegner Array
+    verkehr = [
+
+        // 1. Welle
+        new Car(straße.getLaneCenter(0), carCANVAS.height-600, 50, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(2), carCANVAS.height-600, 50, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(1), carCANVAS.height-900, 50, 200, "DUMMY"),
+
+        // 2. Welle
+        new Car(straße.getLaneCenter(0), carCANVAS.height-1400, 50, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(2), carCANVAS.height-1400, 50, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(1), carCANVAS.height-2000, 50, 200, "DUMMY"),
+
+        // 3. Welle
+        new Car(straße.getLaneCenter(0), carCANVAS.height-2400, 50, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(2), carCANVAS.height-2400, 50, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(1), carCANVAS.height-3000, 50, 75, "DUMMY"),
+
+        // 4. Welle
+        new Car(straße.getLaneCenter(0), carCANVAS.height-2800, 50, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(1), carCANVAS.height-2800, 50, 75, "DUMMY"),
+
+        // 5. Welle
+        new Car(straße.getLaneCenter(0), carCANVAS.height-3400, 50, 100, "DUMMY"),
+        new Car(straße.getLaneCenter(2), carCANVAS.height-3400, 50, 75, "DUMMY"),
+
+        // 6. Welle
+        new Car(straße.getLaneCenter(2), carCANVAS.height-3500, 50, 50, "DUMMY"),
+        new Car(straße.getLaneCenter(1), carCANVAS.height-3800, 50, 75, "DUMMY"),
+
+        // 7. Welle
+        new Car(straße.getLaneCenter(0)+20, carCANVAS.height-3800, 150, 75, "DUMMY")
+    ];
+}
+
 //#endregion Utility-Functions
 
 
@@ -599,28 +648,7 @@ function loadBrain(){
 
 //#region Main
 
-const straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
-controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
-const aiCars = generateCars(POPULATION);
-
-// Gegner Array
-const verkehr = [
-
-    // 1. Welle
-    new Car(straße.getLaneCenter(0), carCANVAS.height-600, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(2), carCANVAS.height-600, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(1), carCANVAS.height-900, 50, 200, "DUMMY"),
-
-    // 2. Welle
-    new Car(straße.getLaneCenter(0), carCANVAS.height-1400, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(2), carCANVAS.height-1400, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(1), carCANVAS.height-2000, 50, 200, "DUMMY"),
-
-    // 3. Welle
-    new Car(straße.getLaneCenter(0), carCANVAS.height-2400, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(2), carCANVAS.height-2400, 50, 75, "DUMMY"),
-    new Car(straße.getLaneCenter(1), carCANVAS.height-3000, 50, 200, "DUMMY")
-];
+initObjects();
 
 // Gameloop
 animate();
@@ -700,8 +728,11 @@ function animate(time){
 
 //#region EventListener
 
+
+
 // Seite Neuladen
 restartBTN.onclick = () => {
+    //initObjects();
     location.reload();
 }
 
@@ -766,7 +797,7 @@ controllerBTN.onclick = () => {
         spawnViewBTN.disabled = true;
     }
     controlledAI.ySpeed = 0;
-    controlledAI.x = besteAI.x;
+    controlledAI.x = carCANVAS.width / 2;;
     controlledAI.y = carCANVAS.height / 2;
 }
 
