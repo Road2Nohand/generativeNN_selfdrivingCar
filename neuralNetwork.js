@@ -14,6 +14,33 @@ class NeuralNetwork {
         }
         return outputs;
     }
+
+    // bei t_amount = 1 bekommen wir einen komplett neuen Wert, ansonsten zwischen altem und random [-1,1]
+    static mutate(network, t_amount=1){
+        network.denseLayers.forEach(layer => {
+
+            //biases mutieren
+            for(let i=0; i < layer.biases.length; i++){
+                layer.biases[i] = lerp(
+                    layer.biases[i], 
+                    Math.random()*2-1,
+                    t_amount
+                    );
+            }
+
+            //weights mutieren
+            for(let i=0; i < layer.weights.length; i++){
+                //weights je Neuron
+                for(let j=0; j < layer.weights.length; j++){
+                    layer.weights[i][j] = lerp(
+                        layer.weights[i][j],
+                        Math.random()*2-1,
+                        t_amount
+                    );
+                }
+            }
+        });
+    }
 }
 
 
