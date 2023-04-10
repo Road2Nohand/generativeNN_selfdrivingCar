@@ -914,6 +914,7 @@ controllerBTN.onclick = () => {
     controlledAI.ySpeed = 0;
     controlledAI.x = carCANVAS.width / 2;;
     controlledAI.y = carCANVAS.height / 2;
+    controlledAI.brain = besteAI.brain;
 }
 
 //#endregion EventListener
