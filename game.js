@@ -693,6 +693,7 @@ function loadBrain(){
 //#region Main
 
 initObjects();
+besteAI = aiCars[0];
 
 // loadBrain
 /// bevor Game startet, wird bestes brain von letzter epoche an alle agents übergeben
@@ -704,20 +705,12 @@ if(autoLoad && localStorage.getItem("besteAI")){ // wenn keine AI gesaved wurde,
 let startTime = performance.now(); // Performance.now() liefert die vergangene Zeit seitdem die Seite geladen wurde in ms
 let vergangeneZeit = 0;
 let highScore = 0;
+let highScore_every5sek = 0;
 
 // Gameloop
 animate();
 function animate(time){
     requestAnimationFrame(animate);
-
-    
-    // Vergangen Zeit messen in Sek.
-    if(time - startTime >= 1000){
-        vergangeneZeit += 1;
-        console.log("vergangeneZeit: ",vergangeneZeit, "highScore: ",highScore)
-        startTime = performance.now();
-    }
-    
 
     // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
     if (window.innerWidth <= 1000){
@@ -728,6 +721,31 @@ function animate(time){
         carCANVAS.height = window.innerHeight;
         nnCANVAS.height = window.innerHeight * 0.7;
     }
+
+    // AUTO EPOCH
+    // Vergangen Zeit messen in Sek.
+    if(time - startTime >= 1000){
+        vergangeneZeit += 1;
+
+        if(vergangeneZeit % 4 == 0){
+
+            // wenn die letzten 4 Sek. keine 500px progess dann nächste Epoche
+            if(autoEpoch && highScore > (highScore_every5sek-500) ){
+                // save best brain
+                safeBrain(besteAI.brain);
+                // restart
+                location.reload();
+            }
+
+            // update der 4 Sek für nächsten Check
+            highScore_every5sek = highScore;
+        }
+        
+        console.log("vergangeneZeit: ",vergangeneZeit, "highScore: ",highScore);
+        startTime = performance.now();
+    }
+   
+    
 
     // UPDATEN
     // Auto Daten je Frame aktualisieren
@@ -743,23 +761,12 @@ function animate(time){
     populationCounter.innerText = "Population: " + (POPULATION - anzCarsTot);
 
     // FITNESS FUNCTION
-    besteAI = aiCars[0];
     aiCars.forEach(ai => {
-        if(ai.y < besteAI.y){
+        if(ai.y <= besteAI.y){
             besteAI = ai;
             highScore = besteAI.y;
         }
     });
-
-    // Auto Epoch wenn der 5sek HighScore nach 10sek nicht mehr überschritten wurde
-
-    if(autoEpoch && vergangeneZeit >= 15){
-        // save best brain
-        safeBrain(besteAI.brain);
-        // restart
-        location.reload();
-    }
-
 
     // Kamera Perspektive
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
