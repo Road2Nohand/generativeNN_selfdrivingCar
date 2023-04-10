@@ -52,8 +52,10 @@ button:hover {
 
 #loadDiv {
     font-size: 22px;
+    background: darkgray;
+    border-radius: 10px 10px;
 }
-#loadDiv input{
+#autoLoadCHECKBOX{
    scale: 1.5;
 }
 #loadDiv label{
