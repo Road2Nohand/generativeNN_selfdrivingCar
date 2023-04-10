@@ -83,10 +83,7 @@ button:hover {
 
 h1 {
     font-size: 300%;
-}
-
-#nnCanvas {
-    background: gray;
+    color: black;
 }
 
 a {

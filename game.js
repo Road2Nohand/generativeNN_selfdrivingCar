@@ -622,6 +622,19 @@ function safeBrain(brain){
     localStorage.setItem("besteAI", JSON.stringify(brain)); // Gegenteil wäre JSON.parse()
 }
 
+function loadBrain(){
+    // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
+    for(let i=0; i < aiCars.length; i++){
+        aiCars[i].brain = JSON.parse(localStorage.getItem("besteAI"));
+
+        // alle AIs mutieren um 10% bis auf erste AI
+        if(i != 0){
+            NeuralNetwork.mutate(aiCars[i].brain, t_MUTATE);
+        }
+    }
+}
+
+
 // mehrere nn Cars instanziieren
 function generateCars(n){
     aiCars = [];
@@ -668,20 +681,15 @@ function initObjects(){
         new Car(straße.getLaneCenter(1), carCANVAS.height-3800, 50, 75, "DUMMY"),
 
         // 7. Welle
-        new Car(straße.getLaneCenter(0)+20, carCANVAS.height-3800, 150, 75, "DUMMY")
+        new Car(straße.getLaneCenter(0)+20, carCANVAS.height-3800, 150, 75, "DUMMY"),
+
+        // 8. Welle
+        new Car(straße.getLaneCenter(2), carCANVAS.height-4500, 75, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(1), carCANVAS.height-5000, 75, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(2), carCANVAS.height-5500, 75, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(1), carCANVAS.height-6000, 75, 75, "DUMMY"),
+        new Car(straße.getLaneCenter(0), carCANVAS.height-6300, 75, 75, "DUMMY")
     ];
-}
-
-function loadBrain(){
-    // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
-    for(let i=0; i < aiCars.length; i++){
-        aiCars[i].brain = JSON.parse(localStorage.getItem("besteAI"));
-
-        // alle AIs mutieren um 10% bis auf erste AI
-        if(i != 0){
-            NeuralNetwork.mutate(aiCars[i].brain, t_MUTATE);
-        }
-    }
 }
 
 //#endregion Utility-Functions
