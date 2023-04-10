@@ -57,6 +57,7 @@ let STEUERN = false;
 const restartBTN = document.getElementById("restartBTN");
 const exportBTN = document.getElementById("exportBTN");
 const loadBTN = document.getElementById("loadBTN");
+const resetBTN = document.getElementById("resetBTN");
 
 // CheckBoxen
 const autoLoadCHECKBOX = document.getElementById("autoLoadCHECKBOX");
@@ -878,6 +879,17 @@ loadBTN.onclick =  () => {
 exportBTN.onclick =  () => {
     exportBrain();
 }
+
+// Reset 
+resetBTN.onclick =  () => {
+    // Checkboxen disablen
+    localStorage.setItem("autoEpoch", false);
+    localStorage.setItem("autoLoad", false);
+    localStorage.setItem("besteAI", null);
+    location.reload();
+}
+
+
 
 // besten Kandidaten killen
 killBTN.onclick = () => {
