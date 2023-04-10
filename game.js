@@ -175,9 +175,6 @@ class Car {
         this.angle = 0;
         this.acceleration = 0.1;
         this.maxYspeed = maxYspeed;
-        if(controlType == "KEYS"){
-            this.maxYspeed = 8;
-        }
         this.friction = 0.03;
         this.controller = new Controller(controlType);
         this.controlType = controlType;
@@ -619,14 +616,14 @@ function safeBrain(brain){
 function generateCars(n){
     aiCars = [];
     for(let i=1; i <= n; i++){
-        aiCars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4) );
+        aiCars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 6) );
     }
     return aiCars;
 }
 
 function initObjects(){
     straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
-    controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 4);
+    controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 8);
     generateCars(POPULATION);
     besteAI = aiCars[0];
 
