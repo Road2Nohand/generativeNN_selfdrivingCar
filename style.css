@@ -32,7 +32,8 @@ body {
 
 #populationCounter{
     color: white;
-    font-size: 22px;
+    font-size: 24px;
+    text-shadow: 2px 2px 20px yellow;
 }
 
 button {
@@ -50,18 +51,19 @@ button:hover {
     font-size: 22px;
 }
 
-#loadDiv {
+.checkBoxSliderButton_Class {
     font-size: 22px;
     background: darkgray;
     border-radius: 10px 10px;
+    border: 1px solid black;
 }
-#autoLoadCHECKBOX{
+.checkBoxSliderButton_Class .checkbox{
    scale: 1.5;
 }
-#loadDiv label{
+.checkBoxSliderButton_Class label{
     color: white;
  }
-#loadDiv button{
+ .checkBoxSliderButton_Class button{
     margin: 5px;
  }
 

@@ -12,24 +12,35 @@
 
     <div id="carDiv">
         <div id="btnDiv">
-            <div id="populationCounter">Population: 0</div>
-            <div id="sliderDiv">
-                <input type="range" min="1" max="1000" value="100" id="populationSlider">
-                <p id="populationSliderValue">1000</p>
+
+            <div class="checkBoxSliderButton_Class">
+                <button id="restartBTN">Epoch🔄</button>
+
+                <input type="checkbox" class="checkbox" id="autoEpochCHECKBOX">
+                <label> Auto</label>
+
+                <div id="populationCounter">Population: 0</div>
+                <div id="sliderDiv">
+                    <input type="range" min="1" max="1000" value="100" id="populationSlider">
+                    <p id="populationSliderValue">1000</p>
+                </div>
             </div>
-            <button id="restartBTN">Epoch🔄</button>
+
             <button id="saveBTN">Save🧠</button>
             
-            <div id="loadDiv">
-                <input type="checkbox" id="autoLoadCHECKBOX">
-                <label id="autoLoadLabel">Auto</label>
+            <div class="checkBoxSliderButton_Class">
                 <button id="loadBTN">Load🧠</button>
+
+                <input type="checkbox" class="checkbox" id="autoLoadCHECKBOX"> 
+                <label> Auto</label>
+
                 <div id="sliderDiv">
-                    <p><b>Load Mutation</b></p>
+                    <p>Load Mutation</p>
                     <input type="range" min="0" max="100" value="10" id="mutationSlider">
                     <p id="mutationSliderValue">10%</p>
                 </div>
             </div>
+
             <button id="exportBTN">Export🧠</button>
             <button id="killBTN">Kill💀</button>
             <button id="spawnViewBTN">Spawn📸</button>
