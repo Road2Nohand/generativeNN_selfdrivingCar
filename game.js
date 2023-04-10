@@ -66,6 +66,14 @@ if(localStorage.getItem("autoLoad")){ // wenn bereits im Speicher vorhanden
 }
 autoLoadCHECKBOX.checked = autoLoad;
 
+const autoEpochCHECKBOX = document.getElementById("autoEpochCHECKBOX");
+let autoEpoch = false;
+if(localStorage.getItem("autoEpoch")){ // wenn bereits im Speicher vorhanden
+    autoEpoch = JSON.parse(localStorage.getItem("autoEpoch")); //JSON.parse() weil sonst ein String 
+}
+autoEpochCHECKBOX.checked = autoEpoch;
+
+
 // Slider
 const mutationSlider = document.getElementById("mutationSlider");
 const mutationSliderValue = document.getElementById("mutationSliderValue");
@@ -175,10 +183,12 @@ class Car {
         this.angle = 0;
         this.acceleration = 0.1;
         this.maxYspeed = maxYspeed;
+        if(controlType == "DUMMY"){
+            this.maxYspeed = 0;
+        }
         this.friction = 0.03;
         this.controller = new Controller(controlType);
         this.controlType = controlType;
-
         this.useBrain = controlType == "AI";
 
         // Wenn kein Dummy gib ihm Gehirn und Sensoren!
@@ -616,7 +626,7 @@ function safeBrain(brain){
 function generateCars(n){
     aiCars = [];
     for(let i=1; i <= n; i++){
-        aiCars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 6) );
+        aiCars.push(new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "AI", 4) );
     }
     return aiCars;
 }
@@ -686,24 +696,28 @@ initObjects();
 
 // loadBrain
 /// bevor Game startet, wird bestes brain von letzter epoche an alle agents übergeben
-if(autoLoad){
+if(autoLoad && localStorage.getItem("besteAI")){ // wenn keine AI gesaved wurde, klappt der Button nicht
     loadBrain();
 }
 
 // Vergangene Zeit messen
 let startTime = performance.now(); // Performance.now() liefert die vergangene Zeit seitdem die Seite geladen wurde in ms
 let vergangeneZeit = 0;
+let highScore = 0;
 
 // Gameloop
 animate();
 function animate(time){
     requestAnimationFrame(animate);
+
     
-    if(time - startTime >= 10000){
-        vergangeneZeit += 10;
-        console.log(vergangeneZeit + " Sekunde vergangen");
+    // Vergangen Zeit messen in Sek.
+    if(time - startTime >= 1000){
+        vergangeneZeit += 1;
+        console.log("vergangeneZeit: ",vergangeneZeit, "highScore: ",highScore)
         startTime = performance.now();
     }
+    
 
     // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
     if (window.innerWidth <= 1000){
@@ -729,12 +743,22 @@ function animate(time){
     populationCounter.innerText = "Population: " + (POPULATION - anzCarsTot);
 
     // FITNESS FUNCTION
-    besteAI = aiCars[0]
+    besteAI = aiCars[0];
     aiCars.forEach(ai => {
         if(ai.y < besteAI.y){
             besteAI = ai;
+            highScore = besteAI.y;
         }
-    });    
+    });
+
+    // Auto Epoch wenn der 5sek HighScore nach 10sek nicht mehr überschritten wurde
+
+    if(autoEpoch && vergangeneZeit >= 15){
+        // save best brain
+        safeBrain(besteAI.brain);
+        // restart
+        location.reload();
+    }
 
 
     // Kamera Perspektive
@@ -781,15 +805,24 @@ populationSlider.oninput = () => {
     localStorage.setItem("POPULATION", populationSlider.value);
 }
 
-// Seite Neuladen
+// Epoch neuladen
 restartBTN.onclick = () => {
     location.reload(); // schlecheter Workaround anstatt von initObjects, weil sonst bugs mit den Translates oben
 }
+// Auto Load Checkbox
+autoEpochCHECKBOX.onchange = e =>  {
+    if(e.target.checked){
+        autoEpoch = true;
+        localStorage.setItem("autoEpoch", autoEpoch);
+    }else{
+        autoEpoch = false;
+        localStorage.setItem("autoEpoch", autoEpoch);
+    }
+};
 
 // bestes Brain als JSON saven
 saveBTN.onclick = () => {
     safeBrain(besteAI.brain);
-    brainJSON = JSON.stringify(besteAI.brain);
 
     // Anz Layers herausfinden
     numberNeurons = 0;
