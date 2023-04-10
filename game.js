@@ -58,6 +58,14 @@ const restartBTN = document.getElementById("restartBTN");
 const exportBTN = document.getElementById("exportBTN");
 const loadBTN = document.getElementById("loadBTN");
 
+// CheckBoxen
+const autoLoadCHECKBOX = document.getElementById("autoLoadCHECKBOX");
+let autoLoad = false;
+if(localStorage.getItem("autoLoad")){ // wenn bereits im Speicher vorhanden
+    autoLoad = JSON.parse(localStorage.getItem("autoLoad")); //JSON.parse() weil sonst ein String 
+}
+autoLoadCHECKBOX.checked = autoLoad;
+
 // Slider
 const mutationSlider = document.getElementById("mutationSlider");
 const mutationSliderValue = document.getElementById("mutationSliderValue");
@@ -657,6 +665,18 @@ function initObjects(){
     ];
 }
 
+function loadBrain(){
+    // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
+    for(let i=0; i < aiCars.length; i++){
+        aiCars[i].brain = JSON.parse(localStorage.getItem("besteAI"));
+
+        // alle AIs mutieren um 10% bis auf erste AI
+        if(i != 0){
+            NeuralNetwork.mutate(aiCars[i].brain, t_MUTATE);
+        }
+    }
+}
+
 //#endregion Utility-Functions
 
 
@@ -667,11 +687,15 @@ function initObjects(){
 
 initObjects();
 
+// loadBrain
+/// bevor Game startet, wird bestes brain von letzter epoche an alle agents übergeben
+if(autoLoad){
+    loadBrain();
+}
+
 // Vergangene Zeit messen
 let startTime = performance.now(); // Performance.now() liefert die vergangene Zeit seitdem die Seite geladen wurde in ms
 let vergangeneZeit = 0;
-
-
 
 // Gameloop
 animate();
@@ -693,7 +717,6 @@ function animate(time){
         carCANVAS.height = window.innerHeight;
         nnCANVAS.height = window.innerHeight * 0.7;
     }
-
 
     // UPDATEN
     // Auto Daten je Frame aktualisieren
@@ -791,17 +814,19 @@ mutationSlider.oninput = () => {
 }
 
 // Load Brain
-loadBTN.onclick =  () => {
-
-    // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
-    for(let i=0; i < aiCars.length; i++){
-        aiCars[i].brain = JSON.parse(localStorage.getItem("besteAI"));
-
-        // alle AIs mutieren um 10% bis auf erste AI
-        if(i != 0){
-            NeuralNetwork.mutate(aiCars[i].brain, t_MUTATE);
-        }
+// Auto Load Checkbox
+autoLoadCHECKBOX.onchange = e =>  {
+    if(e.target.checked){
+        autoLoad = true;
+        localStorage.setItem("autoLoad", autoLoad);
+    }else{
+        autoLoad = false;
+        localStorage.setItem("autoLoad", autoLoad);
     }
+};
+// Load Button
+loadBTN.onclick =  () => {
+    loadBrain();
 }
 
 // Brain to JSON

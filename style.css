@@ -50,7 +50,22 @@ button:hover {
     font-size: 22px;
 }
 
+#loadDiv {
+    font-size: 22px;
+}
+#loadDiv input{
+   scale: 1.5;
+}
+#loadDiv label{
+    color: white;
+ }
+#loadDiv button{
+    margin: 5px;
+ }
+
 /* carDiv */
+
+
 
 
 
