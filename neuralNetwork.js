@@ -152,7 +152,9 @@ class Visualizer{
                 nnCTX.moveTo(Visualizer.#getNeuronX(inputs, i, left, right), bottom);
                 nnCTX.lineTo(Visualizer.#getNeuronX(outputs, o, left, right), top);
                 // Zeichnen der Wheights in ihrer Stärke
-                const value = weights[i][o] * inputs[i]; // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
+                let value = weights[i][o] * inputs[i]; // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
+                // immer etwas Wert adden damit man immer etwas opacity hat
+                value += value < 0 ? -0.02 : 0.02;
                 nnCTX.strokeStyle = Visualizer.getRGBA(value);
                 nnCTX.lineWidth = 2;
                 nnCTX.stroke();
@@ -190,6 +192,7 @@ class Visualizer{
             nnCTX.fillStyle = "black";
             nnCTX.fill();
 
+            // Aktionen
             // wenn es der letzte Layer ist, Aktionen über die Neuronen schreiben
             if(outputs.length == 4){
                 let aktionen = ["Up", "Left", "Right", "Down"];
@@ -215,7 +218,7 @@ class Visualizer{
             nnCTX.beginPath();
             nnCTX.lineWidth = 3;
             // Zeichnen der Biases nach ihrem Wert, gefeuert wird immer wenn die sum(W*I) > b ist, sprich sehr rot, brauch das Neuron viele negative Eingänge
-            const value = biases[o];
+            let value = biases[o];
             nnCTX.strokeStyle = Visualizer.getRGBA(value);
             nnCTX.arc(x, top, neuronRadius + 6, 0, Math.PI*2);
             nnCTX.setLineDash([6,6]);

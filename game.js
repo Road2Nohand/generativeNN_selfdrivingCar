@@ -91,7 +91,7 @@ mutationSliderValue.innerHTML = mutationSlider.value + "%";
 const populationCounter = document.getElementById("populationCounter");
 const populationSlider = document.getElementById("populationSlider");
 const populationSliderValue = document.getElementById("populationSliderValue");
-POPULATION = 100;
+POPULATION = window.innerWidth <= 1000 ? 50 : 100; // wenn es ein Handy/Tablet ist, weniger Autos
 if(localStorage.getItem("POPULATION")){
     POPULATION = localStorage.getItem("POPULATION");
 }
@@ -888,9 +888,10 @@ exportBTN.onclick =  () => {
 // Reset 
 resetBTN.onclick =  () => {
     // Checkboxen disablen
-    localStorage.setItem("autoEpoch", false);
-    localStorage.setItem("autoLoad", false);
-    localStorage.setItem("besteAI", null);
+    localStorage.removeItem("autoEpoch");
+    localStorage.removeItem("autoLoad");
+    localStorage.removeItem("besteAI");
+    localStorage.removeItem("POPULATION")
     location.reload();
 }
 
@@ -925,11 +926,11 @@ controllerBTN.onclick = () => {
         // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
         spawnViewBTN.style.background = "gray";
         spawnViewBTN.disabled = true;
+        controlledAI.ySpeed = 0;
+        controlledAI.x = carCANVAS.width / 2;
+        controlledAI.y = carCANVAS.height / 2;
+        controlledAI.brain = besteAI.brain;
     }
-    controlledAI.ySpeed = 0;
-    controlledAI.x = carCANVAS.width / 2;;
-    controlledAI.y = carCANVAS.height / 2;
-    controlledAI.brain = besteAI.brain;
 }
 
 //#endregion EventListener
