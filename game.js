@@ -635,7 +635,6 @@ function loadBrain(){
     }
 }
 
-
 // mehrere nn Cars instanziieren
 function generateCars(n){
     aiCars = [];
@@ -750,7 +749,7 @@ function animate(time){
             highScore_every5sek = highScore;
         }
         
-        console.log("vergangeneZeit: ",vergangeneZeit, "highScore: ",highScore);
+        //console.log("vergangeneZeit: ",vergangeneZeit, "highScore: ",highScore);
         startTime = performance.now();
     }
    
@@ -807,6 +806,7 @@ function animate(time){
     }else{
         Visualizer.drawNetwork(nnCTX, besteAI.brain);
     }
+    
 }
 //#endregion Main
 
@@ -888,8 +888,6 @@ resetBTN.onclick =  () => {
     localStorage.setItem("besteAI", null);
     location.reload();
 }
-
-
 
 // besten Kandidaten killen
 killBTN.onclick = () => {

@@ -102,124 +102,88 @@ class DenseLayer {
 }
 
 
-
-
 function getRGBA(value){
     const alpha=Math.abs(value);
     const R=value<0?0:255;
     const G=R;
     const B=value>0?0:255;
     return "rgba("+R+","+G+","+B+","+alpha+")";
-}﻿
+}
+
 
 
 class Visualizer{
-    static drawNetwork(ctx,network){
-        const margin=50;
-        const left=margin;
-        const top=margin;
-        const width=ctx.canvas.width-margin*2;
-        const height=ctx.canvas.height-margin*2;
+    static drawNetwork(nnCTX, network){
+        const margin = 40;
+        const left = margin;
+        const top = margin;
+        const width = nnCTX.canvas.width - margin*2;
+        const height = nnCTX.canvas.height - margin*2;
 
-        const levelHeight=height/network.denseLayers.length;
-
-        for(let i=network.denseLayers.length-1;i>=0;i--){
-            const levelTop=top+
-                lerp(
-                    height-levelHeight,
-                    0,
-                    network.denseLayers.length==1
-                        ?0.5
-                        :i/(network.denseLayers.length-1)
-                );
-
-            ctx.setLineDash([7,3]);
-            Visualizer.drawLevel(ctx,network.denseLayers[i],
-                left,levelTop,
-                width,levelHeight,
-                i==network.denseLayers.length-1
-                    ?['🠉','🠈','🠊','🠋']
-                    :[]
-            );
-        }
-    }
-
-    static drawLevel(ctx,level,left,top,width,height,outputLabels){
-        const right=left+width;
-        const bottom=top+height;
-
-        const {inputs,outputs,weights,biases}=level;
-
-        for(let i=0;i<inputs.length;i++){
-            for(let j=0;j<outputs.length;j++){
-                ctx.beginPath();
-                ctx.moveTo(
-                    Visualizer.#getNodeX(inputs,i,left,right),
-                    bottom
-                );
-                ctx.lineTo(
-                    Visualizer.#getNodeX(outputs,j,left,right),
-                    top
-                );
-                ctx.lineWidth=2;
-                ctx.strokeStyle=getRGBA(weights[i][j]);
-                ctx.stroke();
-            }
-        }
-
-        const nodeRadius=18;
-        for(let i=0;i<inputs.length;i++){
-            const x=Visualizer.#getNodeX(inputs,i,left,right);
-            ctx.beginPath();
-            ctx.arc(x,bottom,nodeRadius,0,Math.PI*2);
-            ctx.fillStyle="black";
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(x,bottom,nodeRadius*0.6,0,Math.PI*2);
-            ctx.fillStyle=getRGBA(inputs[i]);
-            ctx.fill();
-        }
-        
-        for(let i=0;i<outputs.length;i++){
-            const x=Visualizer.#getNodeX(outputs,i,left,right);
-            ctx.beginPath();
-            ctx.arc(x,top,nodeRadius,0,Math.PI*2);
-            ctx.fillStyle="black";
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(x,top,nodeRadius*0.6,0,Math.PI*2);
-            ctx.fillStyle=getRGBA(outputs[i]);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.lineWidth=2;
-            ctx.arc(x,top,nodeRadius*0.8,0,Math.PI*2);
-            ctx.strokeStyle=getRGBA(biases[i]);
-            ctx.setLineDash([3,3]);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            if(outputLabels[i]){
-                ctx.beginPath();
-                ctx.textAlign="center";
-                ctx.textBaseline="middle";
-                ctx.fillStyle="black";
-                ctx.strokeStyle="white";
-                ctx.font=(nodeRadius*1.5)+"px Arial";
-                ctx.fillText(outputLabels[i],x,top+nodeRadius*0.1);
-                ctx.lineWidth=0.5;
-                ctx.strokeText(outputLabels[i],x,top+nodeRadius*0.1);
-            }
-        }
-    }
-
-    static #getNodeX(nodes,index,left,right){
-        return lerp(
+        Visualizer.drawLayer(
+            nnCTX, 
+            network.denseLayers[0],
             left,
-            right,
-            nodes.length==1
-                ?0.5
-                :index/(nodes.length-1)
-        );
+            top,
+            width,
+            height
+            );
     }
-}
+
+    static drawLayer(nnCTX, layer, left, top, width, height){
+        const right = left + width;
+        const bottom = top + height;
+        const neuronRadius = 20; //mit einem margin von 40px mit 20px Abstand zum Rand
+        const {inputs, outputs, weights} = layer; // Attribute aus einem Array in einzelne Variablen mit der "Destrukturierungs Syntax"
+
+        // Connections (zuerst damit sie unterhalb der Kreise gezeichnet werden)
+        for(let i=0; i < inputs.length; i++){
+            for(let o=0; o < outputs.length; o++){
+                nnCTX.beginPath();
+                nnCTX.moveTo(Visualizer.#getNeuronX(inputs, i, left, right), bottom);
+                nnCTX.lineTo(Visualizer.#getNeuronX(outputs, o, left, right), top);
+                // Zeichnen der Wheights in ihrer Stärke
+                const value = weights[i][o] * inputs[i];
+                const alpha  = Math.abs(value); // wenn Wheight=0, wollen wir es auch nicht sehen
+                const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
+                // wenn positiv dann weiß
+                const G = value > 0 ? 255 : 0;
+                const B = value > 0 ? 255 : 0;
+                nnCTX.strokeStyle = "rgba(" +R+ "," +G+ "," +B+ "," +alpha+ ")";
+                nnCTX.lineWidth = 2;
+                nnCTX.stroke();
+            }
+        }
+
+        // Inputs
+        for(let i=0; i < inputs.length; i++){
+            const x = Visualizer.#getNeuronX(inputs, i, left, right);
+            // Kreis zeichnen
+            nnCTX.beginPath();
+            nnCTX.arc(x, bottom, neuronRadius, 0, Math.PI*2);
+            nnCTX.fillStyle = "white";
+            nnCTX.fill();
+        }
+
+        // Outputs
+        for(let o=0; o < outputs.length; o++){
+            const x = Visualizer.#getNeuronX(outputs, o, left, right);
+
+            // Kreis zeichnen
+            nnCTX.beginPath();
+            nnCTX.arc(x, top, neuronRadius, 0, Math.PI*2); // hier bräuchte man eine Abfrage, wie viele Layer noch folgen und dann mit lerp und hight, anstatt von "top"
+            nnCTX.fillStyle = "white";
+            nnCTX.fill();
+        }
+
+    }//drawLayer
+
+
+    static #getNeuronX(neurons, index, left, right){
+        // X Position eines Neurons bei gleichemäßiger Verteilung mittels Linearer Interpolierung
+        const t = neurons.length == 1 ? 0.5 : index/(neurons.length-1); // 0.5 falls nur ein Neuron, weil sonst 1
+        return lerp(left, right, t);
+    }
+
+
+}//endOF class Visualizer

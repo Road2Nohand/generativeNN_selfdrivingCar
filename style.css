@@ -6,7 +6,7 @@
 }
 
 body {
-    background: gray;
+    background: black;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -83,11 +83,11 @@ button:hover {
 
 h1 {
     font-size: 300%;
-    color: black;
+    color: white;
 }
 
 a {
-    color: yellow;
+    color: khaki;
 }
 
 
