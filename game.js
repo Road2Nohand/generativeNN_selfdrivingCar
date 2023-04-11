@@ -737,8 +737,9 @@ function animate(time){
 
         if(vergangeneZeit % 3 == 0){
 
-            // wenn die letzten 3 Sek. keine 500px progess dann nächste Epoche
-            if(autoEpoch && highScore > (highScore_every3sek-500) ){
+            // wenn die letzten 3 Sek. keine 100px progess dann nächste Epoche
+            // 100px Regel ist empfindlich für schlechte Rechner
+            if(autoEpoch && highScore > (highScore_every3sek-100) ){
                 // save best brain
                 safeBrain(besteAI.brain);
                 // restart
@@ -800,7 +801,7 @@ function animate(time){
     carCTX.restore(); //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
     
     // NN zeichnen
-    nnCTX.lineDashOffset = -time/50;
+    nnCTX.lineDashOffset = -time/60; // damit Dashes animiert werden (setLineDash([3,3])) werden die stellen vershoben in jedem frame
     if(STEUERN){
         Visualizer.drawNetwork(nnCTX, controlledAI.brain);
     }else{
@@ -823,6 +824,10 @@ populationSlider.oninput = () => {
 
 // Epoch neuladen
 restartBTN.onclick = () => {
+    if(autoEpoch){
+        safeBrain(besteAI.brain);
+    }
+
     location.reload(); // schlecheter Workaround anstatt von initObjects, weil sonst bugs mit den Translates oben
 }
 // Auto Load Checkbox

@@ -102,17 +102,6 @@ class DenseLayer {
 }
 
 
-function getRGBA(value){
-    const alpha=Math.abs(value);
-    const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
-    // wenn positiv dann weiß
-    const G = value > 0 ? 255 : 0;
-    const B = value > 0 ? 255 : 0;
-    return "rgba("+R+","+G+","+B+","+alpha+")";
-}
-
-
-
 class Visualizer{
     static drawNetwork(nnCTX, network){
         const margin = 40;
@@ -131,10 +120,26 @@ class Visualizer{
             );
     }
 
+    static getRGBA(value){
+        const alpha=Math.abs(value);
+        const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
+        // wenn positiv dann weiß
+        const G = value > 0 ? 255 : 0;
+        const B = value > 0 ? 255 : 0;
+        return "rgba("+R+","+G+","+B+","+alpha+")";
+    }
+
+    static #getNeuronX(neurons, index, left, right){
+        // X Position eines Neurons bei gleichemäßiger Verteilung mittels Linearer Interpolierung
+        const t = neurons.length == 1 ? 0.5 : index/(neurons.length-1); // 0.5 falls nur ein Neuron, weil sonst 1
+        return lerp(left, right, t);
+    }
+    
+
     static drawLayer(nnCTX, layer, left, top, width, height){
         const right = left + width;
         const bottom = top + height;
-        const neuronRadius = 20; //mit einem margin von 40px mit 20px Abstand zum Rand
+        const neuronRadius = 15; //mit einem margin von 40px mit 20px Abstand zum Rand
         const {inputs, outputs, weights, biases} = layer; // Attribute aus einem Array in einzelne Variablen mit der "Destrukturierungs Syntax"
 
         // Connections (zuerst damit sie unterhalb der Kreise gezeichnet werden)
@@ -144,13 +149,8 @@ class Visualizer{
                 nnCTX.moveTo(Visualizer.#getNeuronX(inputs, i, left, right), bottom);
                 nnCTX.lineTo(Visualizer.#getNeuronX(outputs, o, left, right), top);
                 // Zeichnen der Wheights in ihrer Stärke
-                const value = weights[i][o] * inputs[i];
-                const alpha  = Math.abs(value); // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
-                const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
-                // wenn positiv dann weiß
-                const G = value > 0 ? 255 : 0;
-                const B = value > 0 ? 255 : 0;
-                nnCTX.strokeStyle = "rgba(" +R+ "," +G+ "," +B+ "," +alpha+ ")";
+                const value = weights[i][o] * inputs[i]; // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
+                nnCTX.strokeStyle = Visualizer.getRGBA(value);
                 nnCTX.lineWidth = 2;
                 nnCTX.stroke();
             }
@@ -159,47 +159,58 @@ class Visualizer{
         // Inputs
         for(let i=0; i < inputs.length; i++){
             const x = Visualizer.#getNeuronX(inputs, i, left, right);
+            // Schwarzer breiterer Kreis um Connections zu überzeichnen
+            nnCTX.beginPath();
+            nnCTX.arc(x, bottom, neuronRadius+5, 0, Math.PI*2);
+            nnCTX.fillStyle = "black";
+            nnCTX.fill();
+
             // Kreis zeichnen
             nnCTX.beginPath();
             nnCTX.arc(x, bottom, neuronRadius, 0, Math.PI*2);
-            nnCTX.fillStyle = "white";
+            // Weiß füllen je nach Input Reiz
+            nnCTX.fillStyle = Visualizer.getRGBA(inputs[i]);
             nnCTX.fill();
+            // dauerhaften weißen Stroke:
+            nnCTX.strokeStyle = "white";
+            nnCTX.lineWidth = 1;
+            nnCTX.stroke();
         }
 
         // Outputs
         for(let o=0; o < outputs.length; o++){
             const x = Visualizer.#getNeuronX(outputs, o, left, right);
 
+            // Schwarzer breiterer Kreis um Connections zu überzeichnen
+            nnCTX.beginPath();
+            nnCTX.arc(x, top, neuronRadius+15, 0, Math.PI*2);
+            nnCTX.fillStyle = "black";
+            nnCTX.fill();
+
             // Kreis zeichnen
             nnCTX.beginPath();
             nnCTX.arc(x, top, neuronRadius, 0, Math.PI*2); // hier bräuchte man eine Abfrage, wie viele Layer noch folgen und dann mit lerp und hight, anstatt von "top"
-            nnCTX.fillStyle = "white";
+            // Füllen wenn feuert
+            nnCTX.fillStyle = Visualizer.getRGBA(outputs[o]);
             nnCTX.fill();
+            // dauerhaften weißen Stroke:
+            nnCTX.strokeStyle = "white";
+            nnCTX.lineWidth = 1;
+            nnCTX.stroke();
 
             // Biases als Stroke zeichnen
             nnCTX.beginPath();
-            nnCTX.lineWidth = 5;
-            nnCTX.fillStyle = "red";
-            // Zeichnen der Biases nach ihrer Auswirkung in ihrer Stärke
+            nnCTX.lineWidth = 3;
+            // Zeichnen der Biases nach ihrem Wert, gefeuert wird immer wenn die sum(W*I) > b ist, sprich sehr rot, brauch das Neuron viele negative Eingänge
             const value = biases[o];
-            const alpha  = Math.abs(value); // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
-            const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
-            // wenn positiv dann weiß
-            const G = value > 0 ? 255 : 0;
-            const B = value > 0 ? 255 : 0;
-            nnCTX.strokeStyle = "rgba(" +R+ "," +G+ "," +B+ "," +alpha+ ")";
-            nnCTX.arc(x, top, neuronRadius*1.5, 0, Math.PI*2);
+            nnCTX.strokeStyle = Visualizer.getRGBA(value);
+            nnCTX.arc(x, top, neuronRadius + 6, 0, Math.PI*2);
+            nnCTX.setLineDash([6,6]);
             nnCTX.stroke();
+            nnCTX.setLineDash([]);
         }
 
     }//drawLayer
-
-
-    static #getNeuronX(neurons, index, left, right){
-        // X Position eines Neurons bei gleichemäßiger Verteilung mittels Linearer Interpolierung
-        const t = neurons.length == 1 ? 0.5 : index/(neurons.length-1); // 0.5 falls nur ein Neuron, weil sonst 1
-        return lerp(left, right, t);
-    }
 
 
 }//endOF class Visualizer

@@ -41,10 +41,12 @@ button {
     margin: 8px;
     border-radius: 10px 10px;
     cursor: pointer;
+    background: lightgray;
 }
 
 button:hover {
     box-shadow: 2px 2px 20px white;
+    color: white;
 }
 
 #sliderDiv {
@@ -79,6 +81,10 @@ button:hover {
     width: 50vw;
     display: flex;
     flex-direction: column;
+}
+
+#nnCanvas {
+    margin-top: 5vh;
 }
 
 h1 {
