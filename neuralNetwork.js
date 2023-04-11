@@ -106,7 +106,7 @@ class DenseLayer {
 class Visualizer{
 
     static drawNetwork(nnCTX, network){
-        const margin = 40;
+        const margin = 60;
         const left = margin;
         const top = margin;
         const width = nnCTX.canvas.width - margin*2;
@@ -189,6 +189,16 @@ class Visualizer{
             nnCTX.arc(x, top, neuronRadius+15, 0, Math.PI*2);
             nnCTX.fillStyle = "black";
             nnCTX.fill();
+
+            // wenn es der letzte Layer ist, Aktionen über die Neuronen schreiben
+            if(outputs.length == 4){
+                let aktionen = ["Up", "Left", "Right", "Down"];
+                nnCTX.font = "24px Calibri";
+                nnCTX.fillStyle = 'white';
+                let text = aktionen[o];
+                const textWidth = carCTX.measureText(text).width;
+                nnCTX.fillText(text, x - (textWidth/2), 25);
+            }
 
             // Kreis zeichnen
             nnCTX.beginPath();

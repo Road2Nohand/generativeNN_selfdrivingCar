@@ -419,7 +419,7 @@ class Sensor{
         this.auto = auto;
         this.rayCount = 7; //anz der "Fühler" pro Sensor
         this.rayLength = 300; //der Sensor kann nur in einem Radius von 100px "Sehen"
-        this.raySpread = Math.PI / 2; //90° alle Rays befinden sich in diesem Bereich
+        this.raySpread = Math.PI/2; //90° alle Rays befinden sich in diesem Bereich
         this.rays = [];
         this.readings = []; //beinhaltet die Messungen der Rays (Entfernung zu einer Border)
     }
