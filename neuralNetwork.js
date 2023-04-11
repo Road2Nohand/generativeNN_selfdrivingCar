@@ -102,7 +102,9 @@ class DenseLayer {
 }
 
 
+
 class Visualizer{
+
     static drawNetwork(nnCTX, network){
         const margin = 40;
         const left = margin;
@@ -110,14 +112,15 @@ class Visualizer{
         const width = nnCTX.canvas.width - margin*2;
         const height = nnCTX.canvas.height - margin*2;
 
-        Visualizer.drawLayer(
-            nnCTX, 
-            network.denseLayers[0],
-            left,
-            top,
-            width,
-            height
-            );
+        const layerHeight = height / network.denseLayers.length;
+
+        // gehen durch alle layer bis auf "2" durch, man achte auf das "<"
+        for(let i=0; i < network.denseLayers.length; i++){
+            let t = network.denseLayers.length == 1 ? 0.5 : i/(network.denseLayers.length-1);
+            const layerTop = top + lerp(height-layerHeight, 0, t);
+
+            Visualizer.drawLayer(nnCTX, network.denseLayers[i], left, layerTop, width, layerHeight);
+        }
     }
 
     static getRGBA(value){
