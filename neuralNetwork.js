@@ -104,9 +104,10 @@ class DenseLayer {
 
 function getRGBA(value){
     const alpha=Math.abs(value);
-    const R=value<0?0:255;
-    const G=R;
-    const B=value>0?0:255;
+    const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
+    // wenn positiv dann weiß
+    const G = value > 0 ? 255 : 0;
+    const B = value > 0 ? 255 : 0;
     return "rgba("+R+","+G+","+B+","+alpha+")";
 }
 
@@ -134,7 +135,7 @@ class Visualizer{
         const right = left + width;
         const bottom = top + height;
         const neuronRadius = 20; //mit einem margin von 40px mit 20px Abstand zum Rand
-        const {inputs, outputs, weights} = layer; // Attribute aus einem Array in einzelne Variablen mit der "Destrukturierungs Syntax"
+        const {inputs, outputs, weights, biases} = layer; // Attribute aus einem Array in einzelne Variablen mit der "Destrukturierungs Syntax"
 
         // Connections (zuerst damit sie unterhalb der Kreise gezeichnet werden)
         for(let i=0; i < inputs.length; i++){
@@ -174,6 +175,21 @@ class Visualizer{
             nnCTX.arc(x, top, neuronRadius, 0, Math.PI*2); // hier bräuchte man eine Abfrage, wie viele Layer noch folgen und dann mit lerp und hight, anstatt von "top"
             nnCTX.fillStyle = "white";
             nnCTX.fill();
+
+            // Biases als Stroke zeichnen
+            nnCTX.beginPath();
+            nnCTX.lineWidth = 5;
+            nnCTX.fillStyle = "red";
+            // Zeichnen der Biases nach ihrer Auswirkung in ihrer Stärke
+            const value = biases[o];
+            const alpha  = Math.abs(value); // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
+            const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
+            // wenn positiv dann weiß
+            const G = value > 0 ? 255 : 0;
+            const B = value > 0 ? 255 : 0;
+            nnCTX.strokeStyle = "rgba(" +R+ "," +G+ "," +B+ "," +alpha+ ")";
+            nnCTX.arc(x, top, neuronRadius*1.5, 0, Math.PI*2);
+            nnCTX.stroke();
         }
 
     }//drawLayer

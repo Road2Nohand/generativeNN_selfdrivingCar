@@ -713,7 +713,7 @@ if(autoLoad && localStorage.getItem("besteAI")){ // wenn keine AI gesaved wurde,
 let startTime = performance.now(); // Performance.now() liefert die vergangene Zeit seitdem die Seite geladen wurde in ms
 let vergangeneZeit = 0;
 let highScore = 0;
-let highScore_every5sek = 0;
+let highScore_every3sek = 0;
 
 // Gameloop
 animate();
@@ -723,11 +723,11 @@ function animate(time){
     // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
     if (window.innerWidth <= 1000){
         carCANVAS.height = window.innerHeight;
-        nnCANVAS.height = window.innerHeight * 0.7;
+        nnCANVAS.height = window.innerHeight * 0.8;
     }
     else{
         carCANVAS.height = window.innerHeight;
-        nnCANVAS.height = window.innerHeight * 0.7;
+        nnCANVAS.height = window.innerHeight * 0.8;
     }
 
     // AUTO EPOCH
@@ -735,18 +735,18 @@ function animate(time){
     if(time - startTime >= 1000){
         vergangeneZeit += 1;
 
-        if(vergangeneZeit % 4 == 0){
+        if(vergangeneZeit % 3 == 0){
 
-            // wenn die letzten 4 Sek. keine 500px progess dann nächste Epoche
-            if(autoEpoch && highScore > (highScore_every5sek-500) ){
+            // wenn die letzten 3 Sek. keine 500px progess dann nächste Epoche
+            if(autoEpoch && highScore > (highScore_every3sek-500) ){
                 // save best brain
                 safeBrain(besteAI.brain);
                 // restart
                 location.reload();
             }
 
-            // update der 4 Sek für nächsten Check
-            highScore_every5sek = highScore;
+            // update der 3 Sek für nächsten Check
+            highScore_every3sek = highScore;
         }
         
         //console.log("vergangeneZeit: ",vergangeneZeit, "highScore: ",highScore);
@@ -759,7 +759,6 @@ function animate(time){
     // Auto Daten je Frame aktualisieren
     controlledAI.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     aiCars.forEach(ai => ai.update(straße.borders, verkehr));
-
     // Verkehr updaten
     verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
 
@@ -776,6 +775,8 @@ function animate(time){
         }
     });
 
+
+    // DRAWING
     // Kamera Perspektive
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
     if (STEUERN) {
@@ -787,9 +788,8 @@ function animate(time){
     else if (viewSPAWN) {
         carCTX.translate(0, carCANVAS.height * 0.6); //Am Spawn stehen bleiben
     } 
-    
 
-    // DRAWN
+    // Stuff DRAWN
     straße.draw();
     verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
     besteAI.draw("blue", true, 1); // true ist für Sensor
