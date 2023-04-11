@@ -646,7 +646,7 @@ function generateCars(n){
 
 function initObjects(){
     straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
-    controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 8);
+    controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 6);
     generateCars(POPULATION);
     besteAI = aiCars[0];
 
@@ -778,6 +778,14 @@ function animate(time){
 
 
     // DRAWING
+
+    // Highscore zeichnen
+    carCTX.font = '40px Calibri';
+    carCTX.fillStyle = 'yellow';
+    text = highScore.toFixed(0) * -1;
+    textWidth = carCTX.measureText(text).width;
+    carCTX.fillText(text, carCANVAS.width/2 - textWidth/2, 50);
+
     // Kamera Perspektive
     carCTX.save(); // speichern des Canvas-Stacks bis jetzt
     if (STEUERN) {
@@ -799,6 +807,8 @@ function animate(time){
         controlledAI.draw("lawngreen", true, 1);
     }
     carCTX.restore(); //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
+
+    
     
     // NN zeichnen
     nnCTX.lineDashOffset = -time/60; // damit Dashes animiert werden (setLineDash([3,3])) werden die stellen vershoben in jedem frame
@@ -807,7 +817,7 @@ function animate(time){
     }else{
         Visualizer.drawNetwork(nnCTX, besteAI.brain);
     }
-    
+   
 }
 //#endregion Main
 
@@ -926,6 +936,7 @@ controllerBTN.onclick = () => {
         // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
         spawnViewBTN.style.background = "gray";
         spawnViewBTN.disabled = true;
+        controlledAI.damaged = false; // falls kaputt gegangen.
         controlledAI.ySpeed = 0;
         controlledAI.x = carCANVAS.width / 2;
         controlledAI.y = carCANVAS.height / 2;
