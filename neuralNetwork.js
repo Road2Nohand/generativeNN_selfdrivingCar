@@ -144,7 +144,7 @@ class Visualizer{
                 nnCTX.lineTo(Visualizer.#getNeuronX(outputs, o, left, right), top);
                 // Zeichnen der Wheights in ihrer Stärke
                 const value = weights[i][o] * inputs[i];
-                const alpha  = Math.abs(value); // wenn Wheight=0, wollen wir es auch nicht sehen
+                const alpha  = Math.abs(value); // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
                 const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
                 // wenn positiv dann weiß
                 const G = value > 0 ? 255 : 0;
