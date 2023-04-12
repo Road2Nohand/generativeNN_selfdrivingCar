@@ -739,7 +739,7 @@ function animate(time){
 
             // wenn die letzten 3 Sek. keine 100px progess dann nächste Epoche
             // 100px Regel ist empfindlich für schlechte Rechner
-            if(autoEpoch && highScore > (highScore_every3sek-100) ){
+            if(autoEpoch && highScore > (highScore_every3sek-100)){
                 // save best brain
                 safeBrain(besteAI.brain);
                 // restart
@@ -760,7 +760,6 @@ function animate(time){
     // Auto Daten je Frame aktualisieren
     controlledAI.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     aiCars.forEach(ai => ai.update(straße.borders, verkehr));
-    // Verkehr updaten
     verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
 
 
@@ -866,6 +865,9 @@ saveBTN.onclick = () => {
         + "Layers: " + besteAI.brain.denseLayers.length +"\n"
         + "Neurons: " + numberNeurons
     );
+
+    // sofern man vorher versucht hat auf laod button zu klicken, ohne ein gesavtes brain
+    loadBTN.style.background = "lightgray";
 }
 
 mutationSlider.oninput = () => {
@@ -887,7 +889,14 @@ autoLoadCHECKBOX.onchange = e =>  {
 };
 // Load Button
 loadBTN.onclick =  () => {
-    loadBrain();
+    // Load Button deaktievieren, wenn noch kein Gehirn gesaved wurde
+    if(localStorage.getItem("besteAI")){
+        loadBrain();
+    }else{
+        alert("Bitte zuerst ein Brain saven!");
+        loadBTN.style.background = "gray";
+    }
+    
 }
 
 // Brain to JSON
@@ -897,17 +906,17 @@ exportBTN.onclick =  () => {
 
 // Reset 
 resetBTN.onclick =  () => {
-    // Checkboxen disablen
-    localStorage.removeItem("autoEpoch");
-    localStorage.removeItem("autoLoad");
-    localStorage.removeItem("besteAI");
-    localStorage.removeItem("POPULATION")
+    localStorage.clear(); // localStorage leeren
     location.reload();
 }
 
 // besten Kandidaten killen
 killBTN.onclick = () => {
-    besteAI.damaged = true;
+    if(STEUERN){
+        controlledAI.damaged = true;
+    }else{
+        besteAI.damaged = true;
+    }
 }
 
 // spawn view Button
@@ -924,14 +933,16 @@ spawnViewBTN.onclick = () => {
 
 // selber Steuerung übernehmen
 controllerBTN.onclick = () => {
-    if(STEUERN){
+     if(STEUERN){
         STEUERN = false;
+        autoEpoch = true;
         controllerBTN.style.background = "white";
         // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
         spawnViewBTN.style.background = "white";
         spawnViewBTN.disabled = false;
     }else{
         STEUERN = true;
+        autoEpoch = false; // damit die Runde nicht einfach neustartet wenn oben alle gestorben sind
         controllerBTN.style.background = "lawngreen";
         // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
         spawnViewBTN.style.background = "gray";
@@ -940,7 +951,7 @@ controllerBTN.onclick = () => {
         controlledAI.ySpeed = 0;
         controlledAI.x = carCANVAS.width / 2;
         controlledAI.y = carCANVAS.height / 2;
-        controlledAI.brain = besteAI.brain;
+        controlledAI.brain = JSON.parse(localStorage.getItem("besteAI"));
     }
 }
 
