@@ -190,7 +190,7 @@ class Car {
         this.controlType = controlType;
         this.useBrain = controlType == "AI";
 
-        // Wenn kein Dummy gib ihm Gehirn und Sensoren!
+        // Gib ihm Gehirn und Sensoren, wenn kein Dummy!
         if(controlType != "DUMMY"){
             this.sensor = new Sensor(this);
             this.brain = new NeuralNetwork([
@@ -319,8 +319,8 @@ class Car {
             this.sensor.draw();
         }   
 
-        carCTX.fillStyle = carColor;
         carCTX.globalAlpha = alpha;
+        carCTX.fillStyle = carColor;
 
         if(this.damaged){
             carCTX.fillStyle = 'red';
@@ -624,14 +624,12 @@ function safeBrain(brain){
 
 function loadBrain(){
     // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
-    for(let i=0; i < aiCars.length; i++){
+    // alle AIs mutieren um 10% bis auf 0'te AI
+    for(let i=1; i < aiCars.length; i++){
         aiCars[i].brain = JSON.parse(localStorage.getItem("besteAI"));
-
-        // alle AIs mutieren um 10% bis auf erste AI
-        if(i != 0){
-            NeuralNetwork.mutate(aiCars[i].brain, t_MUTATE);
-        }
+        NeuralNetwork.mutate(aiCars[i].brain, t_MUTATE);
     }
+    aiCars[0].brain = JSON.parse(localStorage.getItem("besteAI"));
 }
 
 // mehrere nn Cars instanziieren
@@ -647,7 +645,6 @@ function initObjects(){
     straße = new Road(carCANVAS.width/2, carCANVAS.width * 0.95, laneCount=3);// 0.95 für Abstand am Straßenrand
     controlledAI = new Car(straße.getLaneCenter(1), carCANVAS.height/2, 50, 75, "KEYS", 6);
     generateCars(POPULATION);
-    besteAI = aiCars[0];
 
     // Dummy Array
     verkehr = [
@@ -690,6 +687,25 @@ function initObjects(){
         new Car(straße.getLaneCenter(0), carCANVAS.height-6300, 75, 75, "DUMMY")
     ];
 }
+
+function generateColors(color1, color2, count) {
+    const [r1, g1, b1, a1] = color1;
+    const [r2, g2, b2, a2] = color2;
+  
+    const colors = [];
+  
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const r = r1 + t * (r2 - r1);
+      const g = g1 + t * (g2 - g1);
+      const b = b1 + t * (b2 - b1);
+      const a = a1 + t * (a2 - a1);
+  
+      colors.push([r, g, b, a]);
+    }
+  
+    return colors;
+  }
 
 //#endregion Utility-Functions
 
@@ -765,12 +781,20 @@ function animate(time){
     populationCounter.innerText = "Population: " + (POPULATION - anzCarsTot);
 
     // FITNESS FUNCTION
-    aiCars.forEach(ai => {
-        if(ai.y <= besteAI.y){
-            besteAI = ai;
-            highScore = besteAI.y;
+    // Sortieren des Array aufsteigend (weil -y höher ist)
+    aiCars.sort((a, b) => { // hat einen Aufwand von O(n*log(n)), nur den besten zu finden via Dreiecktausch hätte O(n)
+        if (a.y > b.y) {
+          return 1;
         }
-    });
+        if (a.y < b.y) {
+          return -1;
+        }
+        return 0;
+      });
+    besteAI = aiCars[0];
+    highScore = besteAI.y;
+    // finde die Top 4 als Elternpaare für Crossover (Rekombination)
+    top4Cars = aiCars.slice(0, 4); // "4" ist ausschließlich
 
 
     // DRAWING
@@ -796,8 +820,27 @@ function animate(time){
     // Stuff DRAWN
     straße.draw();
     verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
-    besteAI.draw("blue", true, 1); // true ist für Sensor
-    aiCars.forEach(ai => ai.draw("black", false, 0.7) );
+    // die besten 4 in 2 Blau Tönen und 2 Braun Tönen
+    // 1. Elternpaar
+    besteAI.draw("rgba(0, 0, 255, 1)", true); // true ist für Sensor
+    aiCars[1].draw("rgba(154, 154, 207, 1)"); // leicht Blau
+
+    // 2. Elternpaar
+    aiCars[2].draw("rgba(246, 0, 233, 1)"); // Pink
+    aiCars[3].draw("rgba(207, 169, 205, 1)"); // leicht Pink
+
+    // Farben für je 50 Kinder
+    const parentPair1Colors = generateColors([0, 0, 255, 1], [154, 154, 207, 0.8], 50); // Blau nach leicht Blau
+    const parentPair2Colors = generateColors([246, 0, 233, 1], [207, 169, 205, 0.8], 50); // Pink nach leicht Pink
+
+    aiCars.forEach((ai, index) => {
+        const color = index <= 49 ? parentPair1Colors[index] : parentPair2Colors[index - 50];
+        if (color) {
+          const rgbaString = `rgba(${color.join(',')})`;
+          ai.draw(rgbaString, false, 0.6);
+        }
+      });
+    
     if(STEUERN){
         controlledAI.draw("lawngreen", true, 1);
     }
