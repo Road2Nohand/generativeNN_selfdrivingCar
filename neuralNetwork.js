@@ -154,7 +154,7 @@ class Visualizer{
                 // Zeichnen der Wheights in ihrer Stärke
                 let value = weights[i][o] * inputs[i]; // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
                 // immer etwas Wert adden damit man immer etwas opacity hat
-                value += value < 0 ? -0.02 : 0.02;
+                value += value < 0 ? -0.05 : 0.05; // kann man immer drauf adden weil die Inputs maximal ~0.85 werden aufgrund des Korpus der Cars
                 nnCTX.strokeStyle = Visualizer.getRGBA(value);
                 nnCTX.lineWidth = 2;
                 nnCTX.stroke();

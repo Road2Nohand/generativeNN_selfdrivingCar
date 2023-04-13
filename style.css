@@ -69,6 +69,34 @@ button:hover {
     margin: 5px;
  }
 
+ /* Tooltip Class */
+ .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltiptext {
+    font-size: 22px;
+    opacity: 0;
+    width: 200px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 10px;
+    position: absolute;
+    z-index: 1;
+    transition: opacity 0.3s ease-in-out;
+    transform: translateX(60%);
+    top: -20%;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    opacity: 1;
+    transition-delay: 1s;
+  }
+
+
 /* carDiv */
 
 

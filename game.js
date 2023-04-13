@@ -22,7 +22,7 @@
 
 
 
-//#region Gobals
+//#region Globals
 
 // car Canvas
 const carCANVAS = document.getElementById("carCanvas");
@@ -98,16 +98,14 @@ if(localStorage.getItem("POPULATION")){
 populationSlider.value = POPULATION;
 populationSliderValue.innerHTML = POPULATION;
 
-
-
-// Objects
+// Global Objects
 let controlledAI;
 let besteAI;
 let straße;
 let verkehr = [];
 let aiCars = [];
 
-//#endregionGlobals
+//#endregion Globals
 
 
 
@@ -552,6 +550,7 @@ class Sensor{
 
 
 
+
 //#region Utility-Functions
 
 // Lineare Interpolierungs Hilfs-Funktion
@@ -697,7 +696,6 @@ function initObjects(){
 
 
 
-
 //#region Main
 
 initObjects();
@@ -823,13 +821,7 @@ function animate(time){
 
 
 
-
 //#region EventListener
-
-populationSlider.oninput = () => {
-    populationSliderValue.innerHTML = populationSlider.value;
-    localStorage.setItem("POPULATION", populationSlider.value);
-}
 
 // Epoch neuladen
 restartBTN.onclick = () => {
@@ -849,6 +841,11 @@ autoEpochCHECKBOX.onchange = e =>  {
         localStorage.setItem("autoEpoch", autoEpoch);
     }
 };
+
+populationSlider.oninput = () => {
+    populationSliderValue.innerHTML = populationSlider.value;
+    localStorage.setItem("POPULATION", populationSlider.value);
+}
 
 // bestes Brain als JSON saven
 saveBTN.onclick = () => {
@@ -954,5 +951,27 @@ controllerBTN.onclick = () => {
         controlledAI.brain = JSON.parse(localStorage.getItem("besteAI"));
     }
 }
+
+window.addEventListener("resize", () => {
+    // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
+    if (window.innerWidth <= 1000){
+        carCANVAS.height = window.innerHeight;
+        nnCANVAS.height = window.innerHeight * 0.8;
+    }
+    else{
+        carCANVAS.height = window.innerHeight;
+        nnCANVAS.height = window.innerHeight * 0.8;
+    }
+
+    // canvas BREITEN initial einmal setzen wenn Handy oder Desktop
+    if (window.innerWidth <= 1000){
+        carCANVAS.width = window.innerWidth * 0.7;
+        nnCANVAS.width = window.innerWidth; // in style.css hier 100vw
+        
+    }else{
+        carCANVAS.width = 400;
+        nnCANVAS.width = window.innerWidth * 0.5; // muss 50% sein, weil wir 50vw in style.css genommen haben
+    }
+});
 
 //#endregion EventListener

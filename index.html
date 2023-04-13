@@ -13,22 +13,26 @@
     <div id="carDiv">
         <div id="btnDiv">
 
-            <div class="checkBoxSliderButton_Class">
+            <div class="checkBoxSliderButton_Class tooltip">
                 <button id="restartBTN">Epoch🔄</button>
-
+                    
                 <input type="checkbox" class="checkbox" id="autoEpochCHECKBOX">
-                <label> Auto</label>
+                <label > Auto</label>              
 
                 <div id="populationCounter">Population: 0</div>
                 <div id="sliderDiv">
                     <input type="range" min="1" max="1000" value="100" id="populationSlider">
                     <p id="populationSliderValue">1000</p>
                 </div>
+
+                <span class="tooltiptext">Neustart der Epoche mit eingestellter Population. "Auto" für automatischen Neustart, sofern keine AI für 3sek Fortschritt macht</span>
             </div>
 
-            <button id="saveBTN">Save🧠</button>
+            <button id="saveBTN" class="tooltip">Save🧠
+                <span class="tooltiptext">Speichert das Gehirn, dass am weitesten gekommen ist</span>
+            </button>
             
-            <div class="checkBoxSliderButton_Class">
+            <div class="checkBoxSliderButton_Class tooltip">
                 <button id="loadBTN">Load🧠</button>
 
                 <input type="checkbox" class="checkbox" id="autoLoadCHECKBOX"> 
@@ -39,13 +43,24 @@
                     <input type="range" min="0" max="100" value="10" id="mutationSlider">
                     <p id="mutationSliderValue">10%</p>
                 </div>
+
+                <span class="tooltiptext">Laden des gespeicherten Gehirns mit der eingestellten Mutationsrate. Bei "Auto" direkt zu Epochen-Start</span>
             </div>
 
             <button id="exportBTN">Export🧠</button>
-            <button id="resetBTN">RESET🗑️</button>
+
+            <button id="resetBTN" class="tooltip">RESET🗑️
+                <span class="tooltiptext">Löschen aller Parameter und des trainierten Brains</span>
+            </button>
+
             <button id="killBTN">Kill💀</button>
+
             <button id="spawnViewBTN">Spawn📸</button>
-            <button id="controllerBTN">🎮</button>
+
+            <button id="controllerBTN" class="tooltip">🎮
+                    <span class="tooltiptext">Selber steuern mit Brain von bester AI</span>
+            </button>
+
         </div>
 
         <canvas id="carCanvas"></canvas>
