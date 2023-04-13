@@ -718,7 +718,7 @@ animate();
 function animate(time){
     requestAnimationFrame(animate);
 
-    // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren, anstatt "clearRect", denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
+    // canvas HÖHEN wenn Handy oder Desktop jedes Frame aktualisieren anstatt clearRect(), denn das Ändern der Größe eines Canvas automatisch seinen Inhalt löscht
     if (window.innerWidth <= 1000){
         carCANVAS.height = window.innerHeight;
         nnCANVAS.height = window.innerHeight * 0.8;
@@ -727,6 +727,7 @@ function animate(time){
         carCANVAS.height = window.innerHeight;
         nnCANVAS.height = window.innerHeight * 0.8;
     }
+
 
     // AUTO EPOCH
     // Vergangen Zeit messen in Sek.
@@ -751,7 +752,6 @@ function animate(time){
         //console.log("vergangeneZeit: ",vergangeneZeit, "highScore: ",highScore);
         startTime = performance.now();
     }
-   
     
 
     // UPDATEN
@@ -759,7 +759,6 @@ function animate(time){
     controlledAI.update(straße.borders, verkehr); // übergabe der Straßenränder und DUMMY's für Collision Detection
     aiCars.forEach(ai => ai.update(straße.borders, verkehr));
     verkehr.forEach(gegner => {gegner.update(straße.borders, [])} ); // Dummys dürfen nicht mit sich selber Colliden deswegen leeres Array weil der Verkehr nicht gechecked wird
-
 
     // Populations Counter
     anzCarsTot = (aiCars.filter(car => car.damaged)).length;
@@ -775,7 +774,6 @@ function animate(time){
 
 
     // DRAWING
-
     // Highscore zeichnen
     carCTX.font = '40px Calibri';
     carCTX.fillStyle = 'yellow';
@@ -803,9 +801,7 @@ function animate(time){
     if(STEUERN){
         controlledAI.draw("lawngreen", true, 1);
     }
-    carCTX.restore(); //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"
-
-    
+    carCTX.restore(); //die ursprüngliche x,y Verschiebung wird resetet also die Zeichnungen des alten Stacks "addiert"  
     
     // NN zeichnen
     nnCTX.lineDashOffset = -time/60; // damit Dashes animiert werden (setLineDash([3,3])) werden die stellen vershoben in jedem frame
@@ -933,9 +929,9 @@ controllerBTN.onclick = () => {
      if(STEUERN){
         STEUERN = false;
         autoEpoch = true;
-        controllerBTN.style.background = "white";
+        controllerBTN.style.background = "lightgray";
         // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
-        spawnViewBTN.style.background = "white";
+        spawnViewBTN.style.background = "lightgray";
         spawnViewBTN.disabled = false;
     }else{
         STEUERN = true;
@@ -957,18 +953,14 @@ window.addEventListener("resize", () => {
     if (window.innerWidth <= 1000){
         carCANVAS.height = window.innerHeight;
         nnCANVAS.height = window.innerHeight * 0.8;
+
+        carCANVAS.width = window.innerWidth * 0.7;
+        nnCANVAS.width = window.innerWidth; // in style.css hier 100vw
     }
     else{
         carCANVAS.height = window.innerHeight;
         nnCANVAS.height = window.innerHeight * 0.8;
-    }
 
-    // canvas BREITEN initial einmal setzen wenn Handy oder Desktop
-    if (window.innerWidth <= 1000){
-        carCANVAS.width = window.innerWidth * 0.7;
-        nnCANVAS.width = window.innerWidth; // in style.css hier 100vw
-        
-    }else{
         carCANVAS.width = 400;
         nnCANVAS.width = window.innerWidth * 0.5; // muss 50% sein, weil wir 50vw in style.css genommen haben
     }
