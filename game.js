@@ -623,11 +623,11 @@ function safeBrain(brain){
 }
 
 function loadBrain(){
-    // Uniform Crossover der besten 50% mittels Elitismus für die schlechtesten 50%
-    // Von N cars, werden die top 50% genommen und paare gebildet, wenn nicht aufgeht +1, bei 100 -> 50 Eltern -> 25 Paare
+    // Uniform Crossover innerhalb der besten 50% mittels Elitismus für die schlechtesten 50%
+    // Von N cars, werden die top 50% genommen und Paare gebildet, wenn nicht aufgeht +1, bei 99 -> 50 Eltern -> 25 Paare
     // Die Eltern generieren Chronologisch jeweils 2 Kinder per Crossover -> 50 Kinder (hier auf ungerade Zahlen achten)
-    // Die letzten 50 Kinder werden durch die neuen Ersetzte
-    // alle Cars, bis auf das erste werden wie gehabt mutiert
+    // Die letzten 50 Kinder werden durch die Neuen ersetzt
+    // alle Cars, bis auf das Erste werden wie gehabt mutiert
     // Eine neue Epoche startet
 
     // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
@@ -930,7 +930,7 @@ spawnViewBTN.onclick = () => {
     // für toggle zwischen Spawn und bester AI
     if(viewSPAWN){
         viewSPAWN = false;
-        spawnViewBTN.style.background = "white";
+        spawnViewBTN.style.background = "lightgray";
     }else{
         viewSPAWN = true;
         spawnViewBTN.style.background = "lawngreen";
