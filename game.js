@@ -623,6 +623,13 @@ function safeBrain(brain){
 }
 
 function loadBrain(){
+    // Uniform Crossover der besten 50% mittels Elitismus für die schlechtesten 50%
+    // Von N cars, werden die top 50% genommen und paare gebildet, wenn nicht aufgeht +1, bei 100 -> 50 Eltern -> 25 Paare
+    // Die Eltern generieren Chronologisch jeweils 2 Kinder per Crossover -> 50 Kinder (hier auf ungerade Zahlen achten)
+    // Die letzten 50 Kinder werden durch die neuen Ersetzte
+    // alle Cars, bis auf das erste werden wie gehabt mutiert
+    // Eine neue Epoche startet
+
     // alle AIs bekommen das beste Brain der letzten Epoche, aber alle bis auf besteAI werden mutiert
     // alle AIs mutieren um 10% bis auf 0'te AI
     for(let i=1; i < aiCars.length; i++){
@@ -687,25 +694,6 @@ function initObjects(){
         new Car(straße.getLaneCenter(0), carCANVAS.height-6300, 75, 75, "DUMMY")
     ];
 }
-
-function generateColors(color1, color2, count) {
-    const [r1, g1, b1, a1] = color1;
-    const [r2, g2, b2, a2] = color2;
-  
-    const colors = [];
-  
-    for (let i = 0; i < count; i++) {
-      const t = i / (count - 1);
-      const r = r1 + t * (r2 - r1);
-      const g = g1 + t * (g2 - g1);
-      const b = b1 + t * (b2 - b1);
-      const a = a1 + t * (a2 - a1);
-  
-      colors.push([r, g, b, a]);
-    }
-  
-    return colors;
-  }
 
 //#endregion Utility-Functions
 
@@ -819,27 +807,9 @@ function animate(time){
 
     // Stuff DRAWN
     straße.draw();
-    verkehr.forEach(gegner => {gegner.draw("orange", false, alpha=1)});
-    // die besten 4 in 2 Blau Tönen und 2 Braun Tönen
-    // 1. Elternpaar
-    besteAI.draw("rgba(0, 0, 255, 1)", true); // true ist für Sensor
-    aiCars[1].draw("rgba(154, 154, 207, 1)"); // leicht Blau
-
-    // 2. Elternpaar
-    aiCars[2].draw("rgba(246, 0, 233, 1)"); // Pink
-    aiCars[3].draw("rgba(207, 169, 205, 1)"); // leicht Pink
-
-    // Farben für je 50 Kinder
-    const parentPair1Colors = generateColors([0, 0, 255, 1], [154, 154, 207, 0.8], 50); // Blau nach leicht Blau
-    const parentPair2Colors = generateColors([246, 0, 233, 1], [207, 169, 205, 0.8], 50); // Pink nach leicht Pink
-
-    aiCars.forEach((ai, index) => {
-        const color = index <= 49 ? parentPair1Colors[index] : parentPair2Colors[index - 50];
-        if (color) {
-          const rgbaString = `rgba(${color.join(',')})`;
-          ai.draw(rgbaString, false, 0.6);
-        }
-      });
+    verkehr.forEach(gegner => gegner.draw("orange", false, alpha=1));
+    aiCars.forEach(ai => ai.draw("black", false, 0.6));
+    besteAI.draw("blue", true, 1); // true ist für Sensor
     
     if(STEUERN){
         controlledAI.draw("lawngreen", true, 1);

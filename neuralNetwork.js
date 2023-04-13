@@ -41,7 +41,33 @@ class NeuralNetwork {
             }
         });
     }
-}
+
+    static uniformCrossover(parent1, parent2) {
+        // Annahme: beide Eltern haben die gleiche Netzwerkstruktur
+        const anzNeuronenJeLayer = parent1.denseLayers.map(layer => layer.outputs.length);
+        const child = new NeuralNetwork(anzNeuronenJeLayer);
+    
+        for (let i = 0; i < child.denseLayers.length; i++) {
+            const childLayer = child.denseLayers[i];
+            const parent1Layer = parent1.denseLayers[i];
+            const parent2Layer = parent2.denseLayers[i];
+    
+            // Crossover für Biases
+            for (let j = 0; j < childLayer.biases.length; j++) {
+                childLayer.biases[j] = Math.random() < 0.5 ? parent1Layer.biases[j] : parent2Layer.biases[j];
+            }
+    
+            // Crossover für Gewichte
+            for (let j = 0; j < childLayer.weights.length; j++) {
+                for (let k = 0; k < childLayer.weights[j].length; k++) {
+                    childLayer.weights[j][k] = Math.random() < 0.5 ? parent1Layer.weights[j][k] : parent2Layer.weights[j][k];
+                }
+            }
+        }
+        return child;
+    }
+
+} // endOf Class
 
 
 
