@@ -41,13 +41,16 @@ button {
     margin: 8px;
     border-radius: 10px 10px;
     cursor: pointer;
-    background: lightgray;
-    transition: color 0.2s ease-in-out;
+    background: black;
+    color: white;
+    border: 2px solid white;
+    transition: all 0.1s ease-in-out;
 }
 
 button:hover {
     box-shadow: 2px 2px 20px white;
-    color: white;
+    background: white;
+    color: black;
 }
 
 #sliderDiv {

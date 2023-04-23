@@ -823,7 +823,7 @@ function animate(time){
     }else{
         Visualizer.drawNetwork(nnCTX, besteAI.brain);
     }
-   
+
 }
 //#endregion Main
 
@@ -872,8 +872,8 @@ saveBTN.onclick = () => {
         + "Neurons: " + numberNeurons
     );
 
-    // sofern man vorher versucht hat auf laod button zu klicken, ohne ein gesavtes brain
-    loadBTN.style.background = "lightgray";
+    // sofern man vorher versucht hat auf load button zu klicken, ohne ein gesavtes brain
+    loadBTN.style.background = "black";
 }
 
 mutationSlider.oninput = () => {
@@ -930,7 +930,7 @@ spawnViewBTN.onclick = () => {
     // für toggle zwischen Spawn und bester AI
     if(viewSPAWN){
         viewSPAWN = false;
-        spawnViewBTN.style.background = "lightgray";
+        spawnViewBTN.style.background = "black";
     }else{
         viewSPAWN = true;
         spawnViewBTN.style.background = "lawngreen";
@@ -942,9 +942,9 @@ controllerBTN.onclick = () => {
      if(STEUERN){
         STEUERN = false;
         autoEpoch = true;
-        controllerBTN.style.background = "lightgray";
+        controllerBTN.style.background = "black";
         // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
-        spawnViewBTN.style.background = "lightgray";
+        spawnViewBTN.style.background = "black";
         spawnViewBTN.disabled = false;
     }else{
         STEUERN = true;
