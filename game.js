@@ -947,17 +947,25 @@ controllerBTN.onclick = () => {
         spawnViewBTN.style.background = "black";
         spawnViewBTN.disabled = false;
     }else{
-        STEUERN = true;
-        autoEpoch = false; // damit die Runde nicht einfach neustartet wenn oben alle gestorben sind
-        controllerBTN.style.background = "lawngreen";
-        // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
-        spawnViewBTN.style.background = "gray";
-        spawnViewBTN.disabled = true;
-        controlledAI.damaged = false; // falls kaputt gegangen.
-        controlledAI.ySpeed = 0;
-        controlledAI.x = carCANVAS.width / 2;
-        controlledAI.y = carCANVAS.height / 2;
-        controlledAI.brain = JSON.parse(localStorage.getItem("besteAI"));
+
+        // Condition, nur wenn im localStorage eine "besteAI" gefunden wird zur Steuerung wechseln ansonsten alert
+        if(localStorage.getItem("besteAI")){
+            STEUERN = true;
+            autoEpoch = false; // damit die Runde nicht einfach neustartet wenn oben alle gestorben sind
+            controllerBTN.style.background = "lawngreen";
+            // Spawn Button deaktivieren, weil sowieso nicht clickable wenn Controller an
+            spawnViewBTN.style.background = "gray";
+            spawnViewBTN.disabled = true;
+            controlledAI.damaged = false; // falls kaputt gegangen.
+            controlledAI.ySpeed = 0;
+            controlledAI.x = carCANVAS.width / 2;
+            controlledAI.y = carCANVAS.height / 2;
+            controlledAI.brain = JSON.parse(localStorage.getItem("besteAI"));
+        }else{
+            window.alert("Zuerst ein Netz speichern!");
+            return;
+        }
+        
     }
 }
 
