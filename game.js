@@ -639,6 +639,22 @@ function loadBrain(){
     aiCars[0].brain = JSON.parse(localStorage.getItem("besteAI"));
 }
 
+// Async weil brain.json nicht direkt geladen wird und erst vom WebServer gezogen werden muss
+async function loadAndSetBrainFromStorageOrServer() {
+    if (autoLoad && localStorage.getItem("besteAI")) {
+        loadBrain();
+    } else {
+        try {
+            const response = await fetch('brain.json');
+            const data = await response.json();
+            localStorage.setItem("besteAI", JSON.stringify(data));
+            loadBrain();
+        } catch (error) {
+            console.error("Fehler beim Laden von brain.json:", error);
+        }
+    }
+}
+
 // mehrere nn Cars instanziieren
 function generateCars(n){
     aiCars = [];
@@ -706,10 +722,8 @@ initObjects();
 besteAI = aiCars[0];
 
 // loadBrain
-/// bevor Game startet, wird bestes brain von letzter epoche an alle agents übergeben
-if(autoLoad && localStorage.getItem("besteAI")){ // wenn keine AI gesaved wurde, klappt der Button nicht
-    loadBrain();
-}
+// bevor Game startet, wird bestes brain von letzter epoche an alle agents übergeben, oder das perfekte vom Server gezogen!
+loadAndSetBrainFromStorageOrServer();
 
 // Vergangene Zeit messen
 let startTime = performance.now(); // Performance.now() liefert die vergangene Zeit seitdem die Seite geladen wurde in ms
