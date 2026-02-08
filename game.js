@@ -46,6 +46,7 @@ if (window.innerWidth <= 1000){
 
 // BTNs
 const saveBTN = document.getElementById("saveBTN");
+const trainedBTN = document.getElementById("trainedBTN");
 const killBTN = document.getElementById("killBTN");
 // Kamera
 const spawnViewBTN = document.getElementById("spawnViewBTN");
@@ -81,7 +82,7 @@ const mutationSliderValue = document.getElementById("mutationSliderValue");
 // Slider auf den Wert des Local Storages setzen, sofern vorhanden
 let t_MUTATE = 0.1;
 if(localStorage.getItem("t_MUTATE")){
-    t_MUTATE = localStorage.getItem("t_MUTATE");
+    t_MUTATE = parseFloat(localStorage.getItem("t_MUTATE"));
 }
 mutationSlider.value = t_MUTATE * 100;
 mutationSliderValue.innerHTML = mutationSlider.value + "%";
@@ -93,7 +94,7 @@ const populationSlider = document.getElementById("populationSlider");
 const populationSliderValue = document.getElementById("populationSliderValue");
 POPULATION = window.innerWidth <= 1000 ? 50 : 100; // wenn es ein Handy/Tablet ist, weniger Autos
 if(localStorage.getItem("POPULATION")){
-    POPULATION = localStorage.getItem("POPULATION");
+    POPULATION = parseInt(localStorage.getItem("POPULATION"), 10);
 }
 populationSlider.value = POPULATION;
 populationSliderValue.innerHTML = POPULATION;
@@ -639,20 +640,83 @@ function loadBrain(){
     aiCars[0].brain = JSON.parse(localStorage.getItem("besteAI"));
 }
 
-// Async weil brain.json nicht direkt geladen wird und erst vom WebServer gezogen werden muss
+async function fetchTrainedBrainFromServer() {
+  const response = await fetch("brain.json", { cache: "no-cache" });
+  if (!response.ok) throw new Error(`brain.json HTTP ${response.status}`);
+  return await response.json();
+}
+
+async function ensureTrainedBrainCached() {
+  if (localStorage.getItem("trainedBrain")) return JSON.parse(localStorage.getItem("trainedBrain"));
+
+  const trained = await fetchTrainedBrainFromServer();
+  localStorage.setItem("trainedBrain", JSON.stringify(trained));
+  return trained;
+}
+
+async function ensureBesteAIInitialized() {
+  // Reset hat Priorität: random start erzwingen
+  if (sessionStorage.getItem("resetJustHappened") === "1") {
+    sessionStorage.removeItem("resetJustHappened");
+    // Reset zählt trotzdem als "visited"
+    localStorage.setItem("hasVisited", "1");
+    return false;
+  }
+
+  // Wenn es ein gespeichertes Brain gibt: niemals überschreiben
+  if (localStorage.getItem("besteAI")) {
+    localStorage.setItem("hasVisited", "1");
+    return false;
+  }
+
+  const hasVisited = localStorage.getItem("hasVisited") === "1";
+
+  // Nur beim echten Erstbesuch pretrained holen
+  if (!hasVisited) {
+    const trained = await fetchTrainedBrainFromServer();
+    localStorage.setItem("trainedBrain", JSON.stringify(trained)); // optional
+    localStorage.setItem("besteAI", JSON.stringify(trained));
+    localStorage.setItem("hasVisited", "1");
+    return true; // jetzt initialisiert
+  }
+
+  // Schon mal besucht, aber kein besteAI -> random lassen
+  return false;
+}
+
+function applyBesteAIToPopulation() {
+  // nutzt deine bestehende Logik:
+  // aiCars[0] = besteAI, alle anderen mutieren
+  loadBrain();
+}
+
 async function loadAndSetBrainFromStorageOrServer() {
-    if (autoLoad && localStorage.getItem("besteAI")) {
-        loadBrain();
-    } else {
-        try {
-            const response = await fetch('brain.json');
-            const data = await response.json();
-            localStorage.setItem("besteAI", JSON.stringify(data));
-            loadBrain();
-        } catch (error) {
-            console.error("Fehler beim Laden von brain.json:", error);
-        }
+    markVisited();
+    const initializedNow = await ensureBesteAIInitialized();
+
+    // AutoLoad: immer anwenden, wenn besteAI existiert
+    // Oder: beim echten Erstbesuch einmal anwenden (initializedNow)
+    if (autoLoad || initializedNow) {
+        applyBesteAIToPopulation();
     }
+}
+
+async function setBesteAIToTrainedAndLoad() {
+  try {
+    const trained = await ensureTrainedBrainCached();
+    localStorage.setItem("besteAI", JSON.stringify(trained));
+    applyBesteAIToPopulation();
+    loadBTN.style.background = "black";
+  } catch (e) {
+    console.error(e);
+    alert("Konnte trained brain.json nicht laden.");
+  }
+}
+
+function markVisited() {
+  if (!localStorage.getItem("hasVisited")) {
+    localStorage.setItem("hasVisited", "1");
+  }
 }
 
 // mehrere nn Cars instanziieren
@@ -671,7 +735,6 @@ function initObjects(){
 
     // Dummy Array
     verkehr = [
-
         // 1. Welle
         new Car(straße.getLaneCenter(0), carCANVAS.height-600, 50, 75, "DUMMY"),
         new Car(straße.getLaneCenter(2), carCANVAS.height-600, 50, 75, "DUMMY"),
@@ -890,6 +953,10 @@ saveBTN.onclick = () => {
     loadBTN.style.background = "black";
 }
 
+trainedBTN.onclick = async () => {
+  await setBesteAIToTrainedAndLoad();
+};
+
 mutationSlider.oninput = () => {
     mutationSliderValue.innerHTML = mutationSlider.value + "%";
     t_MUTATE = mutationSlider.value / 100;
@@ -907,17 +974,15 @@ autoLoadCHECKBOX.onchange = e =>  {
         localStorage.setItem("autoLoad", autoLoad);
     }
 };
+
 // Load Button
-loadBTN.onclick =  () => {
-    // Load Button deaktievieren, wenn noch kein Gehirn gesaved wurde
-    if(localStorage.getItem("besteAI")){
-        loadBrain();
-    }else{
-        alert("Bitte zuerst ein Brain saven!");
-        loadBTN.style.background = "gray";
-    }
-    
-}
+loadBTN.onclick = () => {
+  if (localStorage.getItem("besteAI")) {
+    applyBesteAIToPopulation();
+  } else {
+    alert('Kein gespeichertes Brain gefunden. Nutze "Trained🧠" oder speichere erst ein Brain.');
+  }
+};
 
 // Brain to JSON
 exportBTN.onclick =  () => {
@@ -926,6 +991,7 @@ exportBTN.onclick =  () => {
 
 // Reset 
 resetBTN.onclick =  () => {
+    sessionStorage.setItem("resetJustHappened", "1");
     localStorage.clear(); // localStorage leeren
     location.reload();
 }

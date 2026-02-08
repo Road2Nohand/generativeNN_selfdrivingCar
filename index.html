@@ -25,12 +25,17 @@
                     <p id="populationSliderValue">1000</p>
                 </div>
 
-                <span class="tooltiptext">Neustart der Epoche mit eingestellter Population. "Auto" für automatischen Neustart, sofern keine AI für 3sek Fortschritt macht</span>
+                <span class="tooltiptext">Neustart der Epoche. Auto: speichert das beste Brain und startet neu, wenn 3s kein Fortschritt passiert.</span>
             </div>
 
             <button id="saveBTN" class="tooltip">Save🧠
-                <span class="tooltiptext">Speichert das Gehirn, dass am weitesten gekommen ist</span>
+                <span class="tooltiptext">Speichert das aktuell beste Brain lokal.</span>
             </button>
+
+            <button id="trainedBTN" class="tooltip">Load trained🧠
+                <span class="tooltiptext">Setzt das vortrainierte Server-Brain als aktuelles und lädt es in die Population.</span>
+            </button>
+
             
             <div class="checkBoxSliderButton_Class tooltip">
                 <button id="loadBTN">Load🧠</button>
@@ -44,13 +49,13 @@
                     <p id="mutationSliderValue">10%</p>
                 </div>
 
-                <span class="tooltiptext">Laden des gespeicherten Gehirns mit der eingestellten Mutationsrate. Bei "Auto" direkt zu Epochen-Start</span>
+                <span class="tooltiptext">Laden des lokal gespeicherten Gehirns mit der eingestellten Mutationsrate. Bei "Auto" direkt zu Epochen-Start</span>
             </div>
 
             <button id="exportBTN">Export🧠</button>
 
             <button id="resetBTN" class="tooltip">RESET🗑️
-                <span class="tooltiptext">Löschen aller Parameter und des trainierten Brains</span>
+                <span class="tooltiptext">Löscht alle lokalen Einstellungen & Brains und startet neu mit zufälligen Brains.</span>
             </button>
 
             <button id="killBTN">Kill💀</button>
