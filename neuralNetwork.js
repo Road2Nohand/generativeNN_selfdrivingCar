@@ -149,13 +149,23 @@ class Visualizer{
         }
     }
 
-    static getRGBA(value){
-        const alpha=Math.abs(value);
-        const R = value <= 0 ? 255 : 255; // wenn negativ dann rot
-        // wenn positiv dann weiß
-        const G = value > 0 ? 255 : 0;
-        const B = value > 0 ? 255 : 0;
-        return "rgba("+R+","+G+","+B+","+alpha+")";
+    static getRGBA(value, {
+        baseAlpha = 0.1,   // <- Baseline-Helligkeit der Synapsen
+        gamma = 0.6,        // <- <1 macht kleine Werte sichtbarer
+        maxAbs = 1.0        // <- Normalisierung (bei dir passt meist 1.0 gut)
+    } = {}) {
+        // Sign getrennt von Stärke behandeln
+        const sign = Math.sign(value) || 1;
+        const mag = Math.min(Math.abs(value) / maxAbs, 1);      // 0..1
+        const boosted = Math.pow(mag, gamma);                   // Gamma-Kurve
+        const alpha = baseAlpha + (1 - baseAlpha) * boosted;    // Baseline + Anteil
+        
+        // Farbe: negativ rot, positiv weiß
+        const R = 255;
+        const G = sign > 0 ? 255 : 0;
+        const B = sign > 0 ? 255 : 0;
+        
+        return `rgba(${R},${G},${B},${alpha})`;
     }
 
     static #getNeuronX(neurons, index, left, right){
