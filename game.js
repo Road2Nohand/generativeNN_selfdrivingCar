@@ -61,6 +61,9 @@ const exportBTN = document.getElementById("exportBTN");
 const loadBTN = document.getElementById("loadBTN");
 const resetBTN = document.getElementById("resetBTN");
 
+const numbersBTN = document.getElementById("numbersBTN");
+let SHOW_NUMBERS = false;
+
 // CheckBoxen
 const autoLoadCHECKBOX = document.getElementById("autoLoadCHECKBOX");
 let autoLoad = false;
@@ -947,9 +950,10 @@ function animate(time){
     // NN zeichnen
     nnCTX.lineDashOffset = -time/60; // damit Dashes animiert werden (setLineDash([3,3])) werden die stellen vershoben in jedem frame
     if(STEUERN){
-        Visualizer.drawNetwork(nnCTX, controlledAI.brain);
+        Visualizer.drawNetwork(nnCTX, controlledAI.brain, SHOW_NUMBERS);
     }else{
         Visualizer.drawNetwork(nnCTX, besteAI.brain);
+        Visualizer.drawNetwork(nnCTX, besteAI.brain, SHOW_NUMBERS);
     }
 
 }
@@ -1122,5 +1126,11 @@ window.addEventListener("resize", () => {
         nnCANVAS.width = window.innerWidth * 0.5; // muss 50% sein, weil wir 50vw in style.css genommen haben
     }
 });
+
+numbersBTN.onclick = () => {
+    SHOW_NUMBERS = !SHOW_NUMBERS;
+    numbersBTN.style.background = SHOW_NUMBERS ? "lawngreen" : "black";
+    numbersBTN.style.color = SHOW_NUMBERS ? "black" : "white";
+};
 
 //#endregion EventListener

@@ -77,6 +77,9 @@ class DenseLayer {
         this.outputs = new Array(anzOutputNeuronen);
         this.biases = new Array(anzOutputNeuronen);
 
+        // Numbers Feature: Potenzial (Summe vor Aktivierungsfunktion) pro Output-Neuron
+        this.potentials = new Array(anzOutputNeuronen);
+
         this.weights = [];
         for(let i=0; i < anzInputNeuronen; i++){
             // je Input Neuron ein Gewichts-Array auf alle Output-Neuronen
@@ -106,11 +109,19 @@ class DenseLayer {
             layer.inputs[i] = givenInputs[i];
         }
 
+        // Numbers Feature: falls Brain aus JSON kommt, gibt es potentials evtl. nicht -> nachrüsten
+        if(!layer.potentials || layer.potentials.length !== layer.outputs.length){
+            layer.potentials = new Array(layer.outputs.length).fill(0);
+        }
+
         for(let i=0; i < layer.outputs.length; i++){
             let sum = 0;
             for(let j=0; j < layer.inputs.length; j++){
                 sum += layer.inputs[j] * layer.weights[j][i];
             }
+
+            // Numbers Feature: Potenzial speichern (Summe vor der Aktivierungsfunktion)
+            layer.potentials[i] = sum;
             
             // bias als Schwellwert anstatt Aktivierungsfunktion -> "Heaviside-Funktion" H(t) = { 0, wenn t < 0  |  1, wenn t > 0 }
             // dadurch das wir NEAT verwenden, werden die Biases solange gewurschtelt bis man die richtige Ausgabe hat
@@ -131,7 +142,7 @@ class DenseLayer {
 
 class Visualizer{
 
-    static drawNetwork(nnCTX, network){
+    static drawNetwork(nnCTX, network, showNumbers=false){
         const margin = 60;
         const left = margin;
         const top = margin;
@@ -145,7 +156,7 @@ class Visualizer{
             let t = network.denseLayers.length == 1 ? 0.5 : i/(network.denseLayers.length-1);
             const layerTop = top + lerp(height-layerHeight, 0, t);
 
-            Visualizer.drawLayer(nnCTX, network.denseLayers[i], left, layerTop, width, layerHeight);
+            Visualizer.drawLayer(nnCTX, network.denseLayers[i], left, layerTop, width, layerHeight, showNumbers, i==0);
         }
     }
 
@@ -173,20 +184,79 @@ class Visualizer{
         const t = neurons.length == 1 ? 0.5 : index/(neurons.length-1); // 0.5 falls nur ein Neuron, weil sonst 1
         return lerp(left, right, t);
     }
+
+    // --- Numbers Feature ---
+    // Zeichne Text entlang einer Verbindung (mit Strichrichtung/Rotation)
+    static drawTextOnLine(ctx, x1, y1, x2, y2, text){
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+
+        ctx.save();
+        ctx.translate(mx, my);
+        ctx.rotate(angle);
+
+        // Text-Style
+        ctx.font = "14px Calibri";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+
+        // Outline für Lesbarkeit (auf hellen Stellen)
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "black";
+        ctx.strokeText(text, 0, -4);
+
+        ctx.fillStyle = "white";
+        ctx.fillText(text, 0, -4);
+
+        ctx.restore();
+    }
+
+    // Zeichne Text mit Outline (allgemein) (Centered)
+    static drawOutlinedText(ctx, text, x, y, font="14px Calibri"){
+        ctx.save();
+        ctx.font = font;
+        ctx.textAlign = "center";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = "white";
+        ctx.strokeText(text, x, y);
+        ctx.fillText(text, x, y);
+        ctx.restore();
+    }
+
+    // Zeichne Text mit Outline (übernimmt TextAlign/TextBaseline/Font von ctx)
+    static drawOutlinedTextFree(ctx, text, x, y){
+        ctx.save();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = "white";
+        ctx.strokeText(text, x, y);
+        ctx.fillText(text, x, y);
+        ctx.restore();
+    }
+    // --- end Numbers Feature ---
     
 
-    static drawLayer(nnCTX, layer, left, top, width, height){
+    static drawLayer(nnCTX, layer, left, top, width, height, showNumbers=false, isFirstLayer=false){
         const right = left + width;
         const bottom = top + height;
         const neuronRadius = 15; //mit einem margin von 40px mit 20px Abstand zum Rand
         const {inputs, outputs, weights, biases} = layer; // Attribute aus einem Array in einzelne Variablen mit der "Destrukturierungs Syntax"
+        const potentials = layer.potentials || []; // Guard, damit nichts crasht
 
         // Connections (zuerst damit sie unterhalb der Kreise gezeichnet werden)
         for(let i=0; i < inputs.length; i++){
             for(let o=0; o < outputs.length; o++){
+                const x1 = Visualizer.#getNeuronX(inputs, i, left, right);
+                const y1 = bottom;
+                const x2 = Visualizer.#getNeuronX(outputs, o, left, right);
+                const y2 = top;
+
                 nnCTX.beginPath();
-                nnCTX.moveTo(Visualizer.#getNeuronX(inputs, i, left, right), bottom);
-                nnCTX.lineTo(Visualizer.#getNeuronX(outputs, o, left, right), top);
+                nnCTX.moveTo(x1, y1);
+                nnCTX.lineTo(x2, y2);
+
                 // Zeichnen der Wheights in ihrer Stärke
                 let value = weights[i][o] * inputs[i]; // wenn Wheight=0, wollen wir es auch nicht sehen, wenn stark gereizt durch input, stärker zeichen
                 // immer etwas Wert adden damit man immer etwas opacity hat
@@ -194,6 +264,12 @@ class Visualizer{
                 nnCTX.strokeStyle = Visualizer.getRGBA(value);
                 nnCTX.lineWidth = 2;
                 nnCTX.stroke();
+
+                // Numbers Feature: Weight Wert auf der Verbindung anzeigen (mit Strichrichtung)
+                if(showNumbers){
+                    const w = weights[i][o];
+                    Visualizer.drawTextOnLine(nnCTX, x1, y1, x2, y2, w.toFixed(8));
+                }
             }
         }
 
@@ -216,6 +292,27 @@ class Visualizer{
             nnCTX.strokeStyle = "white";
             nnCTX.lineWidth = 1;
             nnCTX.stroke();
+
+            // Numbers Feature: Inputs anzeigen
+            if(showNumbers){
+                if(isFirstLayer){
+                    // Sensor-Inputs wie gehabt unterhalb
+                    nnCTX.save();
+                    nnCTX.textAlign = "center";
+                    nnCTX.textBaseline = "top";
+                    nnCTX.font = "14px Calibri";
+                    Visualizer.drawOutlinedTextFree(nnCTX, inputs[i].toFixed(2), x, bottom + neuronRadius + 6);
+                    nnCTX.restore();
+                }else{
+                    // Hidden-Layer Inputs zentriert im Kreis (das ist der sichtbare "mittlere Layer")
+                    nnCTX.save();
+                    nnCTX.textAlign = "center";
+                    nnCTX.textBaseline = "middle";
+                    nnCTX.font = "16px Calibri";
+                    Visualizer.drawOutlinedTextFree(nnCTX, inputs[i].toFixed(0), x, bottom);
+                    nnCTX.restore();
+                }
+            }
         }
 
         // Outputs
@@ -260,6 +357,52 @@ class Visualizer{
             nnCTX.setLineDash([6,6]);
             nnCTX.stroke();
             nnCTX.setLineDash([]);
+
+            // Numbers Feature: Output im Zentrum, Bias unterhalb + Potenzial rechts vom Neuron
+            if(showNumbers){
+                // Output-Wert ZENTRIERT im Kreis
+                nnCTX.save();
+                nnCTX.textAlign = "center";
+                nnCTX.textBaseline = "middle";
+                nnCTX.font = "16px Calibri";
+                Visualizer.drawOutlinedTextFree(
+                    nnCTX,
+                    outputs[o].toFixed(0),
+                    x,
+                    top
+                );
+                nnCTX.restore();
+            
+                // Bias/Schwellwert unterhalb des Kreises
+                nnCTX.save();
+                nnCTX.textAlign = "center";
+                nnCTX.textBaseline = "top";
+                nnCTX.font = "14px Calibri";
+                Visualizer.drawOutlinedTextFree(
+                    nnCTX,
+                    "b=" + biases[o].toFixed(2),
+                    x,
+                    top + neuronRadius + 22
+                );
+                nnCTX.restore();
+
+                // Potenzial (Summe vor Aktivierungsfunktion) rechts vom Neuron
+                // bei allen layern die keine input layer sind, hätte ich gerne noch die das potenzial also die Summe die in die aktivierungsfunktiong gegebn wird mit 2 nachkommastellen immer rechts vom neuron eingeblendet..
+                // Also neben der mittleren schicht und der letzten
+                const pot = (potentials[o] !== undefined && potentials[o] !== null) ? potentials[o] : 0;
+
+                nnCTX.save();
+                nnCTX.textAlign = "left";
+                nnCTX.textBaseline = "middle";
+                nnCTX.font = "14px Calibri";
+                Visualizer.drawOutlinedTextFree(
+                    nnCTX,
+                    pot.toFixed(2),
+                    x + neuronRadius + 12,
+                    top
+                );
+                nnCTX.restore();
+            }
         }
 
     }//drawLayer
