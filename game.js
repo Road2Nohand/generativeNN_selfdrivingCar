@@ -47,6 +47,7 @@ if (window.innerWidth <= 1000){
 // BTNs
 const saveBTN = document.getElementById("saveBTN");
 const trainedBTN = document.getElementById("trainedBTN");
+const viewTrainedBTN = document.getElementById("viewTrainedBTN");
 const killBTN = document.getElementById("killBTN");
 // Kamera
 const spawnViewBTN = document.getElementById("spawnViewBTN");
@@ -619,6 +620,56 @@ function exportBrain(){
     URL.revokeObjectURL(url);
 }
 
+function openBrainInNewTab() {
+    const jsonString = localStorage.getItem("besteAI");
+
+    if (!jsonString) {
+        alert("Kein gespeichertes Brain gefunden.");
+        return;
+    }
+
+    const blob = new Blob(
+        [JSON.stringify(JSON.parse(jsonString), null, 2)],
+        { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+}
+
+async function viewTrainedBrainInNewTab() {
+  try {
+    const response = await fetch("brain.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error(`brain.json HTTP ${response.status}`);
+
+    const data = await response.json();
+    const reversedLayers = [...data.denseLayers]
+      .reverse()
+      .map(layer => ({
+        outputs: layer.outputs,
+        biases: layer.biases,
+        weights: layer.weights,
+        inputs: layer.inputs,
+        
+      }));
+
+    const ordered = {
+      denseLayers: reversedLayers
+    };
+
+    const blob = new Blob(
+      [JSON.stringify(ordered, null, 2)],
+      { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  } catch (e) {
+    console.error(e);
+    alert("Konnte trained brain.json nicht laden.");
+  }
+}
+
 function safeBrain(brain){
     localStorage.setItem("besteAI", JSON.stringify(brain)); // Gegenteil wäre JSON.parse()
 }
@@ -957,6 +1008,10 @@ trainedBTN.onclick = async () => {
   await setBesteAIToTrainedAndLoad();
 };
 
+viewTrainedBTN.onclick = async () => {
+  await viewTrainedBrainInNewTab();
+};
+
 mutationSlider.oninput = () => {
     mutationSliderValue.innerHTML = mutationSlider.value + "%";
     t_MUTATE = mutationSlider.value / 100;
@@ -987,6 +1042,7 @@ loadBTN.onclick = () => {
 // Brain to JSON
 exportBTN.onclick =  () => {
     exportBrain();
+    openBrainInNewTab();
 }
 
 // Reset 
